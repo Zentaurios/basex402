@@ -1,0 +1,12 @@
+{
+  "network": "base-mainnet",
+  "contractAddress": "0x362EbDDb00933852D80eBDCc8fA6c969dAE5268C",
+  "ownerWallet": "0xe5b0AE2782a61169218Da729EE40caa25eF47885",
+  "serverWallet": "0x5C45Ff4215b3086C766E20d69975925A973A98d5",
+  "royaltyReceiver": "0xe5b0AE2782a61169218Da729EE40caa25eF47885",
+  "deploymentTx": "0x96cee4a6a681faf2e787ca23722965b5b30b9a6f630088d1a8415f308c17054a",
+  "ownershipTransferTx": "completed",
+  "timestamp": "2025-10-25T03:30:00Z",
+  "explorerUrl": "https://basescan.org/address/0x362EbDDb00933852D80eBDCc8fA6c969dAE5268C",
+  "status": "deployed-and-ready"
+}

@@ -1,0 +1,70 @@
+{
+  "name": "x402-contract-deployer",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "type-check": "tsc --noEmit",
+    "compile": "hardhat compile",
+    "deploy:testnet": "hardhat run scripts/deploy.js --network base-sepolia",
+    "deploy:mainnet": "hardhat run scripts/deploy.js --network base-mainnet",
+    "verify": "hardhat verify --network base-sepolia",
+    "test": "forge test",
+    "test:verbose": "forge test -vvv",
+    "test:gas": "forge test --gas-report",
+    "test:coverage": "forge coverage",
+    "test:watch": "forge test --watch",
+    "forge:build": "forge build",
+    "forge:clean": "forge clean"
+  },
+  "dependencies": {
+    "@chainlink/contracts-ccip": "^1.6.1",
+    "@coinbase/cdp-core": "^0.0.43",
+    "@coinbase/cdp-hooks": "^0.0.43",
+    "@coinbase/cdp-react": "^0.0.43",
+    "@coinbase/cdp-sdk": "^1.38.4",
+    "@coinbase/onchainkit": "^0.38.19",
+    "@coinbase/x402": "^0.6.5",
+    "@rainbow-me/rainbowkit": "^2.2.1",
+    "@solana/spl-token": "^0.4.9",
+    "@solana/web3.js": "^1.95.8",
+    "@tanstack/react-query": "^5.90.2",
+    "buffer": "^6.0.3",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "dotenv": "^16.4.7",
+    "framer-motion": "^12.1.0",
+    "jose": "^6.1.0",
+    "lucide-react": "^0.469.0",
+    "next": "15.5.4",
+    "next-themes": "^0.4.4",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "viem": "^2.21.54",
+    "wagmi": "^2.17.4",
+    "x402-next": "^0.6.5"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "autoprefixer": "^10.4.20",
+    "forge-std": "https://github.com/foundry-rs/forge-std",
+    "hardhat": "^2.22.17",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.15",
+    "tsx": "^4.19.2",
+    "typescript": "^5"
+  },
+  "overrides": {
+    "@metamask/sdk": {
+      "@react-native-async-storage/async-storage": "npm:@nolyfill/es-aggregate-error@latest"
+    },
+    "pino": {
+      "pino-pretty": "npm:@nolyfill/es-aggregate-error@latest"
+    }
+  }
+}

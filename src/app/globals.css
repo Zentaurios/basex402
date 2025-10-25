@@ -1,0 +1,226 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Official Base.org Brand Colors - Updated */
+    --base-blue: #0000ff;
+    --base-blue-dark: #0046e6;
+    --base-cerulean: #3c8aff;
+    --base-black: #0a0b0d;
+    --base-white: #ffffff;
+    --base-gray-0: #ffffff;
+    --base-gray-10: #eef0f3;
+    --base-gray-15: #dee1e7;
+    --base-gray-30: #b1b7c3;
+    --base-gray-50: #717886;
+    --base-gray-60: #5b616e;
+    --base-gray-80: #32353d;
+    --base-gray-100: #0a0b0d;
+    --base-tan: #b8a581;
+    --base-yellow: #ffd12f;
+    --base-green: #66c800;
+    --base-lime-green: #b6f569;
+    --base-red: #fc401f;
+    --base-pink: #fea8cd;
+    
+    /* Legacy support - keeping old variable names mapped to new colors */
+    --base-gray-25: #ffffff;
+    --base-gray-150: #b1b7c3;
+    --base-gray-200: #5b616e;
+    --positive: #66c800;
+    --negative: #fc401f;
+    --warning: #ffd12f;
+
+    /* Semantic colors for light mode */
+    --background: var(--base-white);
+    --foreground: var(--base-black);
+    --card: var(--base-white);
+    --card-border: var(--base-gray-15);
+    --input-bg: var(--base-white);
+    --input-border: var(--base-gray-30);
+    --text-primary: var(--base-black);
+    --text-secondary: var(--base-gray-60);
+    --text-muted: var(--base-gray-50);
+    --surface: var(--base-gray-10);
+    --surface-hover: var(--base-gray-15);
+  }
+
+  .dark {
+    /* Dark mode semantic colors */
+    --background: var(--base-gray-100);
+    --foreground: var(--base-white);
+    --card: var(--base-gray-80);
+    --card-border: var(--base-gray-60);
+    --input-bg: var(--base-gray-80);
+    --input-border: var(--base-gray-60);
+    --text-primary: var(--base-white);
+    --text-secondary: var(--base-gray-30);
+    --text-muted: var(--base-gray-50);
+    --surface: var(--base-gray-80);
+    --surface-hover: var(--base-gray-60);
+  }
+
+  html {
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply font-sans antialiased min-h-screen;
+    color: var(--foreground);
+    background-color: var(--background);
+  }
+
+  /* Typography with proper contrast */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-medium;
+    color: var(--text-primary);
+  }
+
+  p {
+    color: var(--text-secondary);
+  }
+
+  /* Links */
+  a {
+    @apply text-base-blue hover:text-base-cerulean transition-colors duration-200;
+  }
+
+  .dark a {
+    @apply text-base-cerulean hover:text-base-blue;
+  }
+
+  /* Focus styles */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-base-blue ring-offset-2;
+  }
+
+  .dark *:focus-visible {
+    @apply ring-base-cerulean;
+  }
+}
+
+@layer components {
+  /* Base.org Button Components */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2;
+    @apply px-6 py-3 rounded-lg font-medium;
+    @apply bg-base-blue text-white;
+    @apply hover:bg-base-blue-dark transition-colors duration-200;
+    @apply focus:outline-none focus:ring-2 focus:ring-base-blue focus:ring-offset-2;
+  }
+
+  .dark .btn-primary {
+    @apply bg-base-cerulean hover:bg-base-blue;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2;
+    @apply px-6 py-3 rounded-lg font-medium;
+    @apply transition-colors duration-200;
+    @apply focus:outline-none focus:ring-2 focus:ring-base-blue focus:ring-offset-2;
+    background-color: var(--surface);
+    color: var(--text-primary);
+  }
+
+  .btn-secondary:hover {
+    background-color: var(--surface-hover);
+  }
+
+  /* Input styles */
+  .input-base {
+    @apply w-full px-3 py-2 rounded-lg border;
+    @apply focus:border-base-blue focus:ring-1 focus:ring-base-blue;
+    @apply transition-colors duration-200;
+    background-color: var(--input-bg);
+    border-color: var(--input-border);
+    color: var(--text-primary);
+  }
+
+  .input-base::placeholder {
+    color: var(--text-muted);
+  }
+
+  .dark .input-base:focus {
+    @apply focus:border-base-cerulean focus:ring-base-cerulean;
+  }
+
+  /* Card styles */
+  .card {
+    @apply rounded-lg border shadow-sm transition-colors duration-200;
+    background-color: var(--card);
+    border-color: var(--card-border);
+  }
+
+  .card:hover {
+    background-color: var(--surface-hover);
+  }
+}
+
+@layer utilities {
+  /* Custom utilities for better contrast */
+  .text-readable {
+    color: var(--text-secondary);
+  }
+
+  .text-primary {
+    @apply text-base-blue;
+  }
+
+  .dark .text-primary {
+    @apply text-base-cerulean;
+  }
+
+  .text-strong {
+    color: var(--text-primary);
+  }
+
+  /* Selection styles */
+  ::selection {
+    @apply bg-base-cerulean text-white;
+  }
+
+  .dark ::selection {
+    @apply bg-base-blue text-white;
+  }
+
+  /* Ensure CDP modals and overlays always appear on top */
+  [role="dialog"],
+  [role="alertdialog"],
+  .cdp-modal,
+  [data-radix-portal],
+  [data-radix-presence],
+  [class*="Modal"],
+  [class*="Dialog"],
+  [class*="Popover"],
+  div[style*="position: fixed"][style*="inset"] {
+    z-index: 9999 !important;
+  }
+  
+  /* CDP specific wrappers */
+  [class*="cdp"] [role="dialog"],
+  [class*="cdp"] [role="alertdialog"] {
+    z-index: 9999 !important;
+  }
+
+  /* OnchainKit wallet modal - ensure it appears above custom modals */
+  /* Target all possible OnchainKit modal elements */
+  [class*="ockConnectWallet"],
+  [class*="ockWalletModal"],
+  [class*="ock-wallet"],
+  [data-onchainkit],
+  [id*="onchainkit"],
+  [class*="onchainkit"] {
+    z-index: 10000 !important;
+  }
+  
+  /* OnchainKit modal backdrop and container */
+  [class*="ock"][role="dialog"],
+  [class*="ock"][role="alertdialog"],
+  div[class*="ock"][style*="position: fixed"] {
+    z-index: 10000 !important;
+  }
+}

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <style>
+            .bg { fill: #ffffff; }
+            .x-color { fill: #000000; font-family: Monaco, monospace; font-size: 160px; font-weight: bold; }
+            .num-color { fill: #0000ff; font-family: Monaco, monospace; font-size: 80px; font-weight: bold; }
+            .code-color { fill: #666666; font-family: Monaco, monospace; font-size: 16px; }
+            .accent-color { fill: #0000ff; font-family: Monaco, monospace; font-size: 28px; font-weight: bold; }
+            .small-text { fill: #0000ff; font-family: Monaco, monospace; font-size: 20px; font-weight: bold; }
+            .border { fill: none; stroke: #0000ff; stroke-width: 6; }
+        </style>
+    </defs>
+    
+    <!-- Background -->
+    <rect width="512" height="512" class="bg"/>
+    
+    <!-- Border -->
+    <rect x="0" y="0" width="512" height="512" class="border"/>
+    <rect x="6" y="6" width="500" height="500" class="border"/>
+    
+    
+    
+    
+    <!-- Protocol name -->
+    <text x="256" y="30" text-anchor="middle" class="small-text">x402 PROTOCOL</text>
+    
+    <!-- REQUEST at top -->
+    <text x="20" y="65" class="code-color">POST /api/x402/payment</text>
+    <text x="20" y="87" class="code-color">{ "amount": 0.001,</text>
+    <text x="20" y="109" class="code-color">  "to": "0x742d35C...",</text>
+    <text x="20" y="131" class="code-color">  "protocol": "x402" }</text>
+    
+    <!-- MAIN x402logo with proper spacing -->
+    <text x="256" y="220" text-anchor="middle" class="x-color">X</text>
+    <text x="256" y="320" text-anchor="middle" class="num-color">402</text>
+    
+    <!-- RESPONSE at bottom -->
+    <text x="20" y="380" class="code-color">200 OK</text>
+    <text x="20" y="402" class="code-color">{ "status": "confirmed",</text>
+    <text x="20" y="424" class="code-color">  "txHash": "0x8f2a..." }</text>
+    
+    <!-- Tier name -->
+    <text x="256" y="497" text-anchor="middle" class="accent-color">PROTOCOL USER</text>
+    
+    <!-- Corner accents -->
+    <polygon points="10,10 35,10 10,35" fill="#0000ff"/>
+    <polygon points="502,10 477,10 502,35" fill="#0000ff"/>
+    <polygon points="10,502 35,502 10,477" fill="#0000ff"/>
+    <polygon points="502,502 477,502 502,477" fill="#0000ff"/>
+</svg>

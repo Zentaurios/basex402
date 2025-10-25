@@ -1,0 +1,12 @@
+{
+  "name": "gif-generator",
+  "version": "1.0.0",
+  "description": "Generate x402NFT GIFs",
+  "scripts": {
+    "generate-gifs": "node generate-gifs.js"
+  },
+  "dependencies": {
+    "canvas": "^2.11.2",
+    "gifencoder": "^2.0.1"
+  }
+}

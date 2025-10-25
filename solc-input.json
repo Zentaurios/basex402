@@ -1,0 +1,25 @@
+{
+  "language": {
+    "solidity": {
+      "version": "0.8.19",
+      "settings": {
+        "optimizer": {
+          "enabled": true,
+          "runs": 200
+        }
+      }
+    }
+  },
+  "sources": {
+    "contracts/X402ProtocolPioneers.sol": {
+      "content": ""
+    }
+  },
+  "settings": {
+    "outputSelection": {
+      "*": {
+        "*": ["*"]
+      }
+    }
+  }
+}

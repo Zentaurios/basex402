@@ -1,0 +1,62 @@
+/**
+ * Force OnchainKit WalletModal to appear above GlobalWalletModal
+ * This is a critical fix to ensure wallet connection works properly
+ */
+
+/* Target the specific OnchainKit modal wrapper with z-40 */
+.base-custom-light.z-40,
+.base-custom-dark.z-40,
+[class*="base-custom"][class*="z-40"],
+.z-40[data-portal-origin="true"] {
+  z-index: 10000 !important;
+  /* Add solid background for the backdrop */
+  background-color: rgba(0, 0, 0, 0.75) !important;
+}
+
+/* Give the modal content a solid background matching the theme */
+[data-testid="ockModalOverlay"] {
+  background-color: var(--card) !important;
+  border-color: var(--card-border) !important;
+}
+
+/* Ensure light theme has white background */
+.base-custom-light [data-testid="ockModalOverlay"] {
+  background-color: #ffffff !important;
+}
+
+/* Ensure dark theme has dark background - more specific selector */
+.dark .base-custom-dark [data-testid="ockModalOverlay"],
+.base-custom-dark [data-testid="ockModalOverlay"] {
+  background-color: #32353d !important;
+}
+
+/* Additional dark mode targeting */
+html.dark [data-testid="ockModalOverlay"] {
+  background-color: #32353d !important;
+}
+
+/* Nuclear option - force ALL OnchainKit elements to be on top */
+[class*="ock"] {
+  position: relative;
+}
+
+/* Specifically target modal overlays and backdrops */
+div[style*="position: fixed"][class*="ock"],
+div[style*="position: absolute"][class*="ock"] {
+  z-index: 10000 !important;
+}
+
+/* Target the wallet modal container specifically */
+[data-testid="ockDialog"],
+[data-testid="ockModalOverlay"],
+[data-testid="ockFocusTrap"],
+[data-testid="ockDismissableLayer"],
+[data-portal-origin="true"],
+[aria-modal="true"][class*="ock"] {
+  z-index: 10000 !important;
+}
+
+/* Override Tailwind's z-40 class when it's on OnchainKit modals */
+.z-40[data-portal-origin] {
+  z-index: 10000 !important;
+}

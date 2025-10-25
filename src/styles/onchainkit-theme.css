@@ -1,0 +1,98 @@
+/**
+ * OnchainKit Theme - Base.org Brand Colors
+ * Matches the CDP theme for consistent styling across embedded and external wallets
+ */
+
+/* Light Mode Theme */
+.base-custom-light {
+  /* Typography and Shape */
+  --ock-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --ock-radius-default: 0.75rem;
+  --ock-radius-inner: 0.375rem;
+
+  /* Foreground Colors */
+  --ock-foreground: #0a0b0d; /* Gray 100 */
+  --ock-foreground-muted: #5b616e; /* Gray 60 */
+  --ock-foreground-inverse: #ffffff; /* White */
+  --ock-foreground-disabled: #b1b7c3; /* Gray 30 */
+
+  /* Background Colors */
+  --ock-background: #ffffff; /* White */
+  --ock-background-hover: #eef0f3; /* Gray 10 */
+  --ock-background-active: #dee1e7; /* Gray 15 */
+  --ock-background-alternate: #eef0f3; /* Gray 10 */
+  --ock-background-alternate-hover: #dee1e7; /* Gray 15 */
+  --ock-background-alternate-active: #b1b7c3; /* Gray 30 */
+  --ock-background-inverse: #f9fafb;
+  --ock-background-inverse-hover: #f3f4f6;
+  --ock-background-inverse-active: #e5e7eb;
+  --ock-background-reverse: #0a0b0d; /* Gray 100 */
+
+  /* Primary Colors - Base Blue */
+  --ock-primary: #0000ff; /* Official Base Blue */
+  --ock-primary-hover: #3c8aff; /* Base Cerulean */
+  --ock-primary-active: #0046e6; /* Darker blue */
+  --ock-primary-washed: #e6f0ff; /* Light blue wash */
+  --ock-primary-disabled: #b3d1ff; /* Disabled state */
+
+  /* Secondary Colors */
+  --ock-secondary: #eef0f3; /* Gray 10 */
+  --ock-secondary-hover: #dee1e7; /* Gray 15 */
+  --ock-secondary-active: #b1b7c3; /* Gray 30 */
+
+  /* State Colors */
+  --ock-error: #fc401f; /* Official Base Red */
+  --ock-warning: #ffd12f; /* Official Base Yellow */
+  --ock-success: #66c800; /* Official Base Green */
+  --ock-success-background: #e6f7d0; /* Light green wash */
+
+  /* Lines/Borders */
+  --ock-line: #dee1e7; /* Gray 15 */
+}
+
+/* Dark Mode Theme */
+.base-custom-dark {
+  /* Typography and Shape */
+  --ock-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --ock-radius-default: 0.75rem;
+  --ock-radius-inner: 0.375rem;
+
+  /* Foreground Colors */
+  --ock-foreground: #ffffff; /* White */
+  --ock-foreground-muted: #b1b7c3; /* Gray 30 */
+  --ock-foreground-inverse: #0a0b0d; /* Gray 100 */
+  --ock-foreground-disabled: #5b616e; /* Gray 60 */
+
+  /* Background Colors */
+  --ock-background: #0a0b0d; /* Gray 100 */
+  --ock-background-hover: #32353d; /* Gray 80 */
+  --ock-background-active: #5b616e; /* Gray 60 */
+  --ock-background-alternate: #32353d; /* Gray 80 */
+  --ock-background-alternate-hover: #5b616e; /* Gray 60 */
+  --ock-background-alternate-active: #717886; /* Gray 50 */
+  --ock-background-inverse: #1f2937;
+  --ock-background-inverse-hover: #374151;
+  --ock-background-inverse-active: #4b5563;
+  --ock-background-reverse: #ffffff; /* White */
+
+  /* Primary Colors - Base Cerulean (better for dark mode) */
+  --ock-primary: #3c8aff; /* Base Cerulean */
+  --ock-primary-hover: #0000ff; /* Base Blue */
+  --ock-primary-active: #0046e6; /* Darker blue */
+  --ock-primary-washed: #1a2b4d; /* Dark blue wash */
+  --ock-primary-disabled: #2d5a99; /* Disabled state */
+
+  /* Secondary Colors */
+  --ock-secondary: #32353d; /* Gray 80 */
+  --ock-secondary-hover: #5b616e; /* Gray 60 */
+  --ock-secondary-active: #717886; /* Gray 50 */
+
+  /* State Colors */
+  --ock-error: #fc401f; /* Official Base Red */
+  --ock-warning: #ffd12f; /* Official Base Yellow */
+  --ock-success: #66c800; /* Official Base Green */
+  --ock-success-background: #1a3d00; /* Dark green wash */
+
+  /* Lines/Borders */
+  --ock-line: #5b616e; /* Gray 60 */
+}

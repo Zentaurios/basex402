@@ -1,0 +1,391 @@
+/**
+ * OnchainKit Wallet Dropdown Custom Styles
+ * Enhanced styling for WalletDropdown with Base.org design system
+ */
+
+/* ===========================
+   DROPDOWN CONTAINER
+   =========================== */
+
+/* Main dropdown with solid background */
+[data-testid="ockWalletDropdown"],
+[data-ock-wallet-dropdown] {
+  background-color: var(--card) !important;
+  border: 1px solid var(--card-border) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  overflow: hidden !important;
+  max-width: 360px !important;
+  width: 360px !important;
+}
+
+.dark [data-testid="ockWalletDropdown"],
+.dark [data-ock-wallet-dropdown] {
+  background-color: var(--base-gray-80) !important;
+  border-color: var(--base-gray-60) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* ===========================
+   IDENTITY SECTION
+   =========================== */
+
+[data-ock-identity] {
+  padding: 16px !important;
+  background-color: transparent !important;
+  border-bottom: 1px solid var(--card-border) !important;
+  cursor: pointer !important;
+  transition: background-color 0.2s ease !important;
+}
+
+[data-ock-identity]:hover {
+  background-color: var(--surface-hover) !important;
+}
+
+.dark [data-ock-identity] {
+  border-bottom-color: var(--base-gray-60) !important;
+}
+
+/* Avatar in identity section */
+[data-ock-identity] [data-ock-avatar] {
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 50% !important;
+  overflow: hidden !important;
+}
+
+/* Default avatar when no image - gradient background */
+[data-ock-avatar] {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 50% !important;
+}
+
+/* Fallback gradient for avatars without images */
+[data-ock-avatar]:not(:has(img[src*="http"])),
+[data-ock-avatar]:has(img[alt="ens avatar"]:not([src])),
+[data-ock-avatar]:has(img[src=""]) {
+  background: linear-gradient(135deg, var(--base-cerulean), var(--base-blue)) !important;
+}
+
+.dark [data-ock-avatar]:not(:has(img[src*="http"])),
+.dark [data-ock-avatar]:has(img[alt="ens avatar"]:not([src])),
+.dark [data-ock-avatar]:has(img[src=""]) {
+  background: linear-gradient(135deg, var(--base-blue), var(--base-cerulean)) !important;
+}
+
+/* Add wallet icon as fallback when no basename image */
+[data-ock-avatar]:not(:has(img[src*="http"]))::after,
+[data-ock-avatar]:has(img[alt="ens avatar"]:not([src]))::after,
+[data-ock-avatar]:has(img[src=""])::after {
+  content: "👤" !important;
+  font-size: 24px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+}
+
+/* Smaller icon for connect button avatars */
+[data-ock-connect-wallet] [data-ock-avatar]:not(:has(img[src*="http"]))::after,
+[data-ock-connect-wallet] [data-ock-avatar]:has(img[src=""])::after {
+  font-size: 14px !important;
+}
+
+/* Name styling */
+[data-ock-identity] [data-ock-name] {
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  color: var(--text-primary) !important;
+}
+
+/* Address styling */
+[data-ock-identity] [data-ock-address] {
+  font-size: 13px !important;
+  font-family: 'JetBrains Mono', 'Courier New', monospace !important;
+  color: var(--text-secondary) !important;
+  opacity: 0.8 !important;
+}
+
+/* Balance styling */
+[data-ock-identity] [data-ock-eth-balance],
+[data-ock-eth-balance] {
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  font-family: 'JetBrains Mono', 'Courier New', monospace !important;
+  color: var(--text-primary) !important;
+  display: block !important;
+}
+
+/* Ensure balance text is visible */
+[data-ock-eth-balance] span {
+  color: var(--text-primary) !important;
+}
+
+/* Custom classes for inline identity display */
+.ock-identity-inline [data-ock-address],
+.ock-identity-inline [data-ock-eth-balance] {
+  color: var(--text-secondary) !important;
+  font-size: 12px !important;
+}
+
+.ock-identity-inline [data-ock-name] {
+  color: var(--text-primary) !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+}
+
+/* ===========================
+   BASENAME SECTION
+   =========================== */
+
+[data-ock-wallet-dropdown-basename] {
+  padding: 12px 16px !important;
+  border-bottom: 1px solid var(--card-border) !important;
+  background-color: transparent !important;
+  transition: background-color 0.2s ease !important;
+}
+
+[data-ock-wallet-dropdown-basename]:hover {
+  background-color: var(--surface-hover) !important;
+  cursor: pointer !important;
+}
+
+.dark [data-ock-wallet-dropdown-basename] {
+  border-bottom-color: var(--base-gray-60) !important;
+}
+
+/* Basename text styling */
+[data-ock-wallet-dropdown-basename] span {
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: var(--text-primary) !important;
+}
+
+/* ===========================
+   DROPDOWN LINKS
+   =========================== */
+
+[data-ock-wallet-dropdown-link] {
+  padding: 12px 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: var(--text-primary) !important;
+  background-color: transparent !important;
+  border: none !important;
+  border-bottom: 1px solid var(--card-border) !important;
+  transition: background-color 0.2s ease !important;
+  cursor: pointer !important;
+  text-decoration: none !important;
+}
+
+[data-ock-wallet-dropdown-link]:hover {
+  background-color: var(--surface-hover) !important;
+}
+
+.dark [data-ock-wallet-dropdown-link] {
+  border-bottom-color: var(--base-gray-60) !important;
+}
+
+/* Link icons */
+[data-ock-wallet-dropdown-link] svg {
+  width: 18px !important;
+  height: 18px !important;
+  color: var(--text-secondary) !important;
+}
+
+/* Fund link specific styling */
+[data-ock-wallet-dropdown-fund-link] {
+  padding: 12px 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: var(--base-blue) !important;
+  background-color: transparent !important;
+  border-bottom: 1px solid var(--card-border) !important;
+  transition: all 0.2s ease !important;
+  cursor: pointer !important;
+}
+
+[data-ock-wallet-dropdown-fund-link]:hover {
+  background-color: var(--surface-hover) !important;
+  color: var(--base-cerulean) !important;
+}
+
+.dark [data-ock-wallet-dropdown-fund-link] {
+  color: var(--base-cerulean) !important;
+  border-bottom-color: var(--base-gray-60) !important;
+}
+
+.dark [data-ock-wallet-dropdown-fund-link]:hover {
+  color: var(--base-blue) !important;
+}
+
+/* ===========================
+   DISCONNECT BUTTON
+   =========================== */
+
+[data-ock-wallet-dropdown-disconnect] {
+  padding: 12px 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: var(--base-red) !important;
+  background-color: transparent !important;
+  border: none !important;
+  transition: background-color 0.2s ease !important;
+  cursor: pointer !important;
+  width: 100% !important;
+  text-align: left !important;
+}
+
+[data-ock-wallet-dropdown-disconnect]:hover {
+  background-color: rgba(252, 64, 31, 0.1) !important;
+}
+
+[data-ock-wallet-dropdown-disconnect] svg {
+  width: 18px !important;
+  height: 18px !important;
+}
+
+/* ===========================
+   CONNECT WALLET BUTTON
+   =========================== */
+
+[data-ock-connect-wallet] {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 10px 16px !important;
+  border-radius: 8px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  background-color: var(--base-blue) !important;
+  color: white !important;
+  border: 2px solid var(--base-blue) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+  transition: all 0.2s ease !important;
+  cursor: pointer !important;
+}
+
+[data-ock-connect-wallet]:hover {
+  background-color: var(--base-blue-dark) !important;
+  border-color: var(--base-blue-dark) !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15) !important;
+  transform: translateY(-1px) !important;
+}
+
+.dark [data-ock-connect-wallet] {
+  background-color: var(--base-cerulean) !important;
+  border-color: var(--base-cerulean) !important;
+}
+
+.dark [data-ock-connect-wallet]:hover {
+  background-color: var(--base-blue) !important;
+  border-color: var(--base-blue) !important;
+}
+
+/* Connected state (shows avatar + name) */
+[data-ock-connect-wallet]:has([data-ock-avatar]) {
+  background-color: transparent !important;
+  color: var(--text-primary) !important;
+  border-color: var(--card-border) !important;
+}
+
+[data-ock-connect-wallet]:has([data-ock-avatar]):hover {
+  background-color: var(--surface-hover) !important;
+  border-color: var(--card-border) !important;
+  transform: none !important;
+}
+
+/* Avatar in connect button */
+[data-ock-connect-wallet] [data-ock-avatar] {
+  width: 24px !important;
+  height: 24px !important;
+  border-radius: 50% !important;
+}
+
+/* Name in connect button */
+[data-ock-connect-wallet] [data-ock-name] {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+}
+
+/* ===========================
+   RESPONSIVE DESIGN
+   =========================== */
+
+@media (max-width: 640px) {
+  [data-testid="ockWalletDropdown"],
+  [data-ock-wallet-dropdown] {
+    max-width: calc(100vw - 32px) !important;
+    width: calc(100vw - 32px) !important;
+  }
+
+  [data-ock-connect-wallet] {
+    font-size: 13px !important;
+    padding: 8px 14px !important;
+  }
+}
+
+/* ===========================
+   SCROLLBAR STYLING
+   =========================== */
+
+[data-ock-wallet-dropdown] > div::-webkit-scrollbar {
+  width: 6px;
+}
+
+[data-ock-wallet-dropdown] > div::-webkit-scrollbar-track {
+  background: var(--surface);
+  border-radius: 3px;
+}
+
+[data-ock-wallet-dropdown] > div::-webkit-scrollbar-thumb {
+  background: var(--text-muted);
+  border-radius: 3px;
+}
+
+[data-ock-wallet-dropdown] > div::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+/* ===========================
+   LOADING & EMPTY STATES
+   =========================== */
+
+[data-ock-loading] {
+  padding: 16px !important;
+  text-align: center !important;
+  color: var(--text-secondary) !important;
+}
+
+/* Badge styling for Basename */
+[data-ock-badge] {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  padding: 4px 8px !important;
+  background-color: var(--surface) !important;
+  border-radius: 6px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  color: var(--text-secondary) !important;
+}
+
+.dark [data-ock-badge] {
+  background-color: var(--base-gray-60) !important;
+}
