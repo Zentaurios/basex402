@@ -1,9 +1,41 @@
 // Core types for the x402Contract Deployer application
 
+import { type WalletClient } from 'viem';
+
 // x402 Payment Protocol Types
+
+/**
+ * Unified signer interface for x402 payments
+ * Works with both CDP embedded wallets and external wallets
+ */
+export interface X402Signer {
+  /** The wallet address (smart account for display purposes) */
+  address: string;
+  
+  /** The EOA owner address (used for x402 payments) */
+  eoaAddress?: string;
+  
+  /** 
+   * Function to sign EIP-712 typed data
+   * Used for EIP-3009 transfer authorizations
+   */
+  signTypedData?: ((params: {
+    domain: any;
+    types: any;
+    primaryType: string;
+    message: any;
+  }) => Promise<string>) | null;
+  
+  /** Wallet client for external wallets (optional, used for chain validation) */
+  walletClient?: WalletClient | null;
+  
+  /** Loading state (true if wallet is still initializing) */
+  isLoading?: boolean;
+}
+
 export interface X402PaymentRequest {
   scheme: 'exact';
-  network: 'base-sepolia' | 'base-mainnet';
+  network: 'base-sepolia' | 'base';
   maxAmountRequired: string; // USDC amount in atomic units (6 decimals)
   resource: string;
   description: string;
@@ -18,19 +50,19 @@ export interface X402PaymentRequest {
 }
 
 export interface X402PaymentHeader {
-  x402Version: '0.0.1';
+  x402Version: 1; // NUMBER not string!
   scheme: 'exact';
-  network: 'base-sepolia' | 'base-mainnet';
-  paymentPayload: {
-    from: string;
-    to: string;
-    value: string;
-    validAfter: number;
-    validBefore: number;
-    nonce: string;
-    v: number;
-    r: string;
-    s: string;
+  network: 'base-sepolia' | 'base';
+  payload: {
+    signature: string; // Full signature (v,r,s combined)
+    authorization: {
+      from: string;
+      to: string;
+      value: string;
+      validAfter: string;
+      validBefore: string;
+      nonce: string;
+    };
   };
 }
 
@@ -87,13 +119,13 @@ export interface ServerWalletConfig {
   apiKeyId: string;
   apiKeySecret: string;
   walletSecret: string;
-  network: 'base-sepolia' | 'base-mainnet';
+  network: 'base-sepolia' | 'base';
 }
 
 // Embedded Wallet Types (Beta - may change)
 export interface EmbeddedWalletConfig {
   appId: string;
-  network: 'base-sepolia' | 'base-mainnet';
+  network: 'base-sepolia' | 'base';
 }
 
 export interface WalletInfo {
@@ -135,7 +167,7 @@ export interface PaymentFlowContext {
 
 // App Configuration
 export interface AppConfig {
-  network: 'base-sepolia' | 'base-mainnet';
+  network: 'base-sepolia' | 'base';
   usdcAddress: string;
   explorerUrl: string;
   rpcUrl: string;

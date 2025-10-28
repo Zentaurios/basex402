@@ -8,8 +8,8 @@ import "@/styles/wallet-dropdown-custom.css"; // Custom WalletDropdown styling
 import { Providers } from "./providers";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { Header } from "@/components/layout/Header";
-import { PWAInstaller } from "@/components/PWAInstaller";
-import { PWAUpdateNotifier } from "@/components/PWAUpdateNotifier";
+// import { PWAInstaller } from "@/components/PWAInstaller";
+// import { PWAUpdateNotifier } from "@/components/PWAUpdateNotifier";
 import { defaultMetadata, viewport as defaultViewport, organizationStructuredData } from "@/lib/metadata";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -40,8 +40,8 @@ export default function RootLayout({
       </head>
       <body className={`${inter.className} antialiased flex flex-col min-h-screen`}>
         {/* PWA Components */}
-        <PWAInstaller />
-        <PWAUpdateNotifier />
+        {/*<PWAInstaller />
+        <PWAUpdateNotifier />*/}
         
         <ThemeProvider
           attribute="class"

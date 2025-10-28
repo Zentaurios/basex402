@@ -1,0 +1,969 @@
+🔍 Wallet Detection: {detectedType: 'embedded', address: '0x44F6Db8E90B5B97fa08668Bdb2E968ad9A42e9A9', hasWalletClient: false, connectorName: undefined, currentChainId: 8453}
+page.tsx:194 Starting x402 payment and NFT mint for 1 NFT(s)...
+x402-client.ts:58 🌐 [x402-client] Making x402 request to: /api/mint
+x402-client.ts:59 🔑 [x402-client] Signer available: {hasWalletClient: false, hasSignTypedData: true, address: '0x44F6Db8E90B5B97fa08668Bdb2E968ad9A42e9A9'}
+useX402Signer.ts:30 🔍 [useX402Signer] Using CDP smart account wallet {walletType: 'embedded', address: '0x44F6Db8E90B5B97fa08668Bdb2E968ad9A42e9A9', smartAccountAddress: '0x44F6Db8E90B5B97fa08668Bdb2E968ad9A42e9A9', eoaAddress: '0x5E0008Fa547064BF1feCeF0FbF091e8Df40B59d4', hasSignTypedData: true, …}
+useX402Signer.ts:30 🔍 [useX402Signer] Using CDP smart account wallet {walletType: 'embedded', address: '0x44F6Db8E90B5B97fa08668Bdb2E968ad9A42e9A9', smartAccountAddress: '0x44F6Db8E90B5B97fa08668Bdb2E968ad9A42e9A9', eoaAddress: '0x5E0008Fa547064BF1feCeF0FbF091e8Df40B59d4', hasSignTypedData: true, …}
+x402-client.ts:68  POST http://localhost:3000/api/mint 402 (Payment Required)
+makeX402Request @ x402-client.ts:68
+handleMint @ page.tsx:202
+executeDispatch @ react-dom-client.development.js:16971
+runWithFiberInDEV @ react-dom-client.development.js:872
+processDispatchQueue @ react-dom-client.development.js:17021
+eval @ react-dom-client.development.js:17622
+batchedUpdates$1 @ react-dom-client.development.js:3312
+dispatchEventForPluginEventSystem @ react-dom-client.development.js:17175
+dispatchEvent @ react-dom-client.development.js:21358
+dispatchDiscreteEvent @ react-dom-client.development.js:21326
+<button>
+exports.jsxDEV @ react-jsx-dev-runtime.development.js:323
+MintPage @ page.tsx:578
+react_stack_bottom_frame @ react-dom-client.development.js:23584
+renderWithHooksAgain @ react-dom-client.development.js:6893
+renderWithHooks @ react-dom-client.development.js:6805
+updateFunctionComponent @ react-dom-client.development.js:9247
+beginWork @ react-dom-client.development.js:10858
+runWithFiberInDEV @ react-dom-client.development.js:872
+performUnitOfWork @ react-dom-client.development.js:15727
+workLoopSync @ react-dom-client.development.js:15547
+renderRootSync @ react-dom-client.development.js:15527
+performWorkOnRoot @ react-dom-client.development.js:14991
+performWorkOnRootViaSchedulerTask @ react-dom-client.development.js:16816
+performWorkUntilDeadline @ scheduler.development.js:45
+(anonymous) @ inpage.js:1
+l @ inpage.js:1
+r @ inpage.js:1
+<MintPage>
+exports.jsx @ react-jsx-runtime.development.js:323
+ClientPageRoot @ client-page.js:20
+react_stack_bottom_frame @ react-dom-client.development.js:23584
+renderWithHooksAgain @ react-dom-client.development.js:6893
+renderWithHooks @ react-dom-client.development.js:6805
+updateFunctionComponent @ react-dom-client.development.js:9247
+beginWork @ react-dom-client.development.js:10807
+runWithFiberInDEV @ react-dom-client.development.js:872
+performUnitOfWork @ react-dom-client.development.js:15727
+workLoopConcurrentByScheduler @ react-dom-client.development.js:15721
+renderRootConcurrent @ react-dom-client.development.js:15696
+performWorkOnRoot @ react-dom-client.development.js:14990
+performWorkOnRootViaSchedulerTask @ react-dom-client.development.js:16816
+performWorkUntilDeadline @ scheduler.development.js:45
+(anonymous) @ inpage.js:1
+l @ inpage.js:1
+r @ inpage.js:1
+"use client"
+Promise.all @ VM223203 <anonymous>:1
+Promise.all @ VM223203 <anonymous>:1
+initializeElement @ react-server-dom-webpack-client.browser.development.js:1343
+"use server"
+ResponseInstance @ react-server-dom-webpack-client.browser.development.js:2041
+createResponseFromOptions @ react-server-dom-webpack-client.browser.development.js:3094
+exports.createFromReadableStream @ react-server-dom-webpack-client.browser.development.js:3478
+eval @ app-index.js:130
+(app-pages-browser)/./node_modules/next/dist/client/app-index.js @ main-app.js?v=1761567565885:160
+options.factory @ webpack.js:1
+__webpack_require__ @ webpack.js:1
+fn @ webpack.js:1
+eval @ app-next-dev.js:14
+eval @ app-bootstrap.js:59
+loadScriptsInSequence @ app-bootstrap.js:24
+appBootstrap @ app-bootstrap.js:53
+eval @ app-next-dev.js:13
+(app-pages-browser)/./node_modules/next/dist/client/app-next-dev.js @ main-app.js?v=1761567565885:182
+options.factory @ webpack.js:1
+__webpack_require__ @ webpack.js:1
+__webpack_exec__ @ main-app.js?v=1761567565885:1889
+(anonymous) @ main-app.js?v=1761567565885:1890
+webpackJsonpCallback @ webpack.js:1
+(anonymous) @ main-app.js?v=1761567565885:9Understand this error
+x402-client.ts:69 📥 [x402-client] Response status: 402
+x402-client.ts:81 💳 [x402-client] Got 402 Payment Required - initiating payment flow...
+x402-client.ts:97 📄 [x402-client] Response body: {"scheme":"exact","network":"base","maxAmountRequired":"1000000","resource":"/api/mint","description":"Mint 1 x402 Protocol Pioneer NFT on Base","mimeType":"application/json","payTo":"0xe5b0AE2782a61169218Da729EE40caa25eF47885","maxTimeoutSeconds":300,"asset":"0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913","extra":{"name":"USD Coin","version":"2"}}
+x402-client.ts:99 ✅ [x402-client] Parsed payment request: {scheme: 'exact', network: 'base', maxAmountRequired: '1000000', resource: '/api/mint', description: 'Mint 1 x402 Protocol Pioneer NFT on Base', …}
+x402-client.ts:106 💰 [x402-client] Amount: 1.00 USDC (1000000 atomic units)
+x402-client.ts:111 ✅ [x402-client] onPaymentRequired callback executed
+x402-client.ts:118 📝 [x402-client] About to call onSigning callback...
+x402-client.ts:120 ✅ [x402-client] onSigning callback executed
+x402-client.ts:123 🔐 [x402-client] Creating payment header...
+x402-client.ts:196 🔍 Wallet info: {isCdpWallet: true, hasWalletClient: false, hasSignTypedData: true, paymentNetwork: 'base'}
+x402-client.ts:235 📝 EIP-712 Domain: {
+  "name": "USD Coin",
+  "version": "2",
+  "chainId": 8453,
+  "verifyingContract": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+}
+x402-client.ts:271 ✍️ [x402-client] Requesting signature...
+x402-client.ts:272 📋 [x402-client] Message to sign: {from: '0x44F6Db8E90B5B97fa08668Bdb2E968ad9A42e9A9', to: '0xe5b0AE2782a61169218Da729EE40caa25eF47885', value: '1000000', validAfter: '1761567602', validBefore: '1761567902', …}
+x402-client.ts:285 ⏳ [x402-client] Waiting for signature (60s timeout)...
+x402-client.ts:286 👆 [x402-client] Please check for a signature prompt from your wallet...
+x402-client.ts:290 ✍️ [x402-client] Using CDP signTypedData
+useX402Signer.ts:79 ✍️ [useX402Signer] Starting CDP signing with multiple attempts... {primaryType: 'TransferWithAuthorization', domain: {…}, smartAccountAddress: '0x44F6Db8E90B5B97fa08668Bdb2E968ad9A42e9A9', eoaAddress: '0x5E0008Fa547064BF1feCeF0FbF091e8Df40B59d4'}
+useX402Signer.ts:87 🔍 [DEBUG] CDP Hook Details: {hookType: 'function', isFunction: true, hookKeys: 'not an object', cdpSignTypedData: ƒ}
+useX402Signer.ts:107 🚨 [DEBUG] About to check for mutateAsync... {hasObject: false, hasMutateAsync: false}
+useX402Signer.ts:198 🔧 [ATTEMPT 1] Calling CDP with evmAccount (smart account)...
+useX402Signer.ts:216 ❌ [ATTEMPT 1] Failed: EVM account not found
+overrideMethod @ hook.js:608
+useX402Signer.useCallback[wrappedCdpSignTypedData] @ useX402Signer.ts:216
+await in useX402Signer.useCallback[wrappedCdpSignTypedData]
+createPaymentHeader @ x402-client.ts:323
+makeX402Request @ x402-client.ts:124
+await in makeX402Request
+handleMint @ page.tsx:202
+executeDispatch @ react-dom-client.development.js:16971
+runWithFiberInDEV @ react-dom-client.development.js:872
+processDispatchQueue @ react-dom-client.development.js:17021
+eval @ react-dom-client.development.js:17622
+batchedUpdates$1 @ react-dom-client.development.js:3312
+dispatchEventForPluginEventSystem @ react-dom-client.development.js:17175
+dispatchEvent @ react-dom-client.development.js:21358
+dispatchDiscreteEvent @ react-dom-client.development.js:21326
+<button>
+exports.jsxDEV @ react-jsx-dev-runtime.development.js:323
+MintPage @ page.tsx:578
+react_stack_bottom_frame @ react-dom-client.development.js:23584
+renderWithHooksAgain @ react-dom-client.development.js:6893
+renderWithHooks @ react-dom-client.development.js:6805
+updateFunctionComponent @ react-dom-client.development.js:9247
+beginWork @ react-dom-client.development.js:10858
+runWithFiberInDEV @ react-dom-client.development.js:872
+performUnitOfWork @ react-dom-client.development.js:15727
+workLoopSync @ react-dom-client.development.js:15547
+renderRootSync @ react-dom-client.development.js:15527
+performWorkOnRoot @ react-dom-client.development.js:14991
+performWorkOnRootViaSchedulerTask @ react-dom-client.development.js:16816
+performWorkUntilDeadline @ scheduler.development.js:45
+(anonymous) @ inpage.js:1
+l @ inpage.js:1
+r @ inpage.js:1
+<MintPage>
+exports.jsx @ react-jsx-runtime.development.js:323
+ClientPageRoot @ client-page.js:20
+react_stack_bottom_frame @ react-dom-client.development.js:23584
+renderWithHooksAgain @ react-dom-client.development.js:6893
+renderWithHooks @ react-dom-client.development.js:6805
+updateFunctionComponent @ react-dom-client.development.js:9247
+beginWork @ react-dom-client.development.js:10807
+runWithFiberInDEV @ react-dom-client.development.js:872
+performUnitOfWork @ react-dom-client.development.js:15727
+workLoopConcurrentByScheduler @ react-dom-client.development.js:15721
+renderRootConcurrent @ react-dom-client.development.js:15696
+performWorkOnRoot @ react-dom-client.development.js:14990
+performWorkOnRootViaSchedulerTask @ react-dom-client.development.js:16816
+performWorkUntilDeadline @ scheduler.development.js:45
+(anonymous) @ inpage.js:1
+l @ inpage.js:1
+r @ inpage.js:1
+"use client"
+Promise.all @ VM223203 <anonymous>:1
+Promise.all @ VM223203 <anonymous>:1
+initializeElement @ react-server-dom-webpack-client.browser.development.js:1343
+"use server"
+ResponseInstance @ react-server-dom-webpack-client.browser.development.js:2041
+createResponseFromOptions @ react-server-dom-webpack-client.browser.development.js:3094
+exports.createFromReadableStream @ react-server-dom-webpack-client.browser.development.js:3478
+eval @ app-index.js:130
+(app-pages-browser)/./node_modules/next/dist/client/app-index.js @ main-app.js?v=1761567565885:160
+options.factory @ webpack.js:1
+__webpack_require__ @ webpack.js:1
+fn @ webpack.js:1
+eval @ app-next-dev.js:14
+eval @ app-bootstrap.js:59
+loadScriptsInSequence @ app-bootstrap.js:24
+appBootstrap @ app-bootstrap.js:53
+eval @ app-next-dev.js:13
+(app-pages-browser)/./node_modules/next/dist/client/app-next-dev.js @ main-app.js?v=1761567565885:182
+options.factory @ webpack.js:1
+__webpack_require__ @ webpack.js:1
+__webpack_exec__ @ main-app.js?v=1761567565885:1889
+(anonymous) @ main-app.js?v=1761567565885:1890
+webpackJsonpCallback @ webpack.js:1
+(anonymous) @ main-app.js?v=1761567565885:9Understand this warning
+useX402Signer.ts:222 🔧 [ATTEMPT 2] Calling CDP with evmAccount (EOA owner)... {eoaAddress: '0x5E0008Fa547064BF1feCeF0FbF091e8Df40B59d4'}
+useX402Signer.ts:223  POST https://api.cdp.coinbase.com/platform/v2/embedded-wallet-api/projects/3b2e62b0-9bf9-4a70-af17-e6f558b567eb/end-users/7678c54c-b3df-47d7-9ae7-ec91f6935fc2/evm/sign/typed-data 400 (Bad Request)
+dispatchXhrRequest @ xhr.js:212
+xhr @ xhr.js:29
+dispatchRequest @ dispatchRequest.js:61
+Promise.then
+_request @ Axios.js:175
+request @ Axios.js:52
+wrap @ bind.js:9
+b @ index4.js:51
+S @ index2.js:119
+eval @ index.web5.js:195
+f @ index.web15.js:21
+await in f
+Me @ index.web5.js:194
+eval @ index3.js:95
+useX402Signer.useCallback[wrappedCdpSignTypedData] @ useX402Signer.ts:223
+await in useX402Signer.useCallback[wrappedCdpSignTypedData]
+createPaymentHeader @ x402-client.ts:323
+makeX402Request @ x402-client.ts:124
+await in makeX402Request
+handleMint @ page.tsx:202
+executeDispatch @ react-dom-client.development.js:16971
+runWithFiberInDEV @ react-dom-client.development.js:872
+processDispatchQueue @ react-dom-client.development.js:17021
+eval @ react-dom-client.development.js:17622
+batchedUpdates$1 @ react-dom-client.development.js:3312
+dispatchEventForPluginEventSystem @ react-dom-client.development.js:17175
+dispatchEvent @ react-dom-client.development.js:21358
+dispatchDiscreteEvent @ react-dom-client.development.js:21326
+<button>
+exports.jsxDEV @ react-jsx-dev-runtime.development.js:323
+MintPage @ page.tsx:578
+react_stack_bottom_frame @ react-dom-client.development.js:23584
+renderWithHooksAgain @ react-dom-client.development.js:6893
+renderWithHooks @ react-dom-client.development.js:6805
+updateFunctionComponent @ react-dom-client.development.js:9247
+beginWork @ react-dom-client.development.js:10858
+runWithFiberInDEV @ react-dom-client.development.js:872
+performUnitOfWork @ react-dom-client.development.js:15727
+workLoopSync @ react-dom-client.development.js:15547
+renderRootSync @ react-dom-client.development.js:15527
+performWorkOnRoot @ react-dom-client.development.js:14991
+performWorkOnRootViaSchedulerTask @ react-dom-client.development.js:16816
+performWorkUntilDeadline @ scheduler.development.js:45
+(anonymous) @ inpage.js:1
+l @ inpage.js:1
+r @ inpage.js:1
+<MintPage>
+exports.jsx @ react-jsx-runtime.development.js:323
+ClientPageRoot @ client-page.js:20
+react_stack_bottom_frame @ react-dom-client.development.js:23584
+renderWithHooksAgain @ react-dom-client.development.js:6893
+renderWithHooks @ react-dom-client.development.js:6805
+updateFunctionComponent @ react-dom-client.development.js:9247
+beginWork @ react-dom-client.development.js:10807
+runWithFiberInDEV @ react-dom-client.development.js:872
+performUnitOfWork @ react-dom-client.development.js:15727
+workLoopConcurrentByScheduler @ react-dom-client.development.js:15721
+renderRootConcurrent @ react-dom-client.development.js:15696
+performWorkOnRoot @ react-dom-client.development.js:14990
+performWorkOnRootViaSchedulerTask @ react-dom-client.development.js:16816
+performWorkUntilDeadline @ scheduler.development.js:45
+(anonymous) @ inpage.js:1
+l @ inpage.js:1
+r @ inpage.js:1
+"use client"
+Promise.all @ VM223203 <anonymous>:1
+Promise.all @ VM223203 <anonymous>:1
+initializeElement @ react-server-dom-webpack-client.browser.development.js:1343
+"use server"
+ResponseInstance @ react-server-dom-webpack-client.browser.development.js:2041
+createResponseFromOptions @ react-server-dom-webpack-client.browser.development.js:3094
+exports.createFromReadableStream @ react-server-dom-webpack-client.browser.development.js:3478
+eval @ app-index.js:130
+(app-pages-browser)/./node_modules/next/dist/client/app-index.js @ main-app.js?v=1761567565885:160
+options.factory @ webpack.js:1
+__webpack_require__ @ webpack.js:1
+fn @ webpack.js:1
+eval @ app-next-dev.js:14
+eval @ app-bootstrap.js:59
+loadScriptsInSequence @ app-bootstrap.js:24
+appBootstrap @ app-bootstrap.js:53
+eval @ app-next-dev.js:13
+(app-pages-browser)/./node_modules/next/dist/client/app-next-dev.js @ main-app.js?v=1761567565885:182
+options.factory @ webpack.js:1
+__webpack_require__ @ webpack.js:1
+__webpack_exec__ @ main-app.js?v=1761567565885:1889
+(anonymous) @ main-app.js?v=1761567565885:1890
+webpackJsonpCallback @ webpack.js:1
+(anonymous) @ main-app.js?v=1761567565885:9Understand this error
+useX402Signer.ts:240 ❌ [ATTEMPT 2] Failed: Types must include EIP712Domain definition.
+overrideMethod @ hook.js:608
+useX402Signer.useCallback[wrappedCdpSignTypedData] @ useX402Signer.ts:240
+await in useX402Signer.useCallback[wrappedCdpSignTypedData]
+createPaymentHeader @ x402-client.ts:323
+makeX402Request @ x402-client.ts:124
+await in makeX402Request
+handleMint @ page.tsx:202
+executeDispatch @ react-dom-client.development.js:16971
+runWithFiberInDEV @ react-dom-client.development.js:872
+processDispatchQueue @ react-dom-client.development.js:17021
+eval @ react-dom-client.development.js:17622
+batchedUpdates$1 @ react-dom-client.development.js:3312
+dispatchEventForPluginEventSystem @ react-dom-client.development.js:17175
+dispatchEvent @ react-dom-client.development.js:21358
+dispatchDiscreteEvent @ react-dom-client.development.js:21326
+<button>
+exports.jsxDEV @ react-jsx-dev-runtime.development.js:323
+MintPage @ page.tsx:578
+react_stack_bottom_frame @ react-dom-client.development.js:23584
+renderWithHooksAgain @ react-dom-client.development.js:6893
+renderWithHooks @ react-dom-client.development.js:6805
+updateFunctionComponent @ react-dom-client.development.js:9247
+beginWork @ react-dom-client.development.js:10858
+runWithFiberInDEV @ react-dom-client.development.js:872
+performUnitOfWork @ react-dom-client.development.js:15727
+workLoopSync @ react-dom-client.development.js:15547
+renderRootSync @ react-dom-client.development.js:15527
+performWorkOnRoot @ react-dom-client.development.js:14991
+performWorkOnRootViaSchedulerTask @ react-dom-client.development.js:16816
+performWorkUntilDeadline @ scheduler.development.js:45
+(anonymous) @ inpage.js:1
+l @ inpage.js:1
+r @ inpage.js:1
+<MintPage>
+exports.jsx @ react-jsx-runtime.development.js:323
+ClientPageRoot @ client-page.js:20
+react_stack_bottom_frame @ react-dom-client.development.js:23584
+renderWithHooksAgain @ react-dom-client.development.js:6893
+renderWithHooks @ react-dom-client.development.js:6805
+updateFunctionComponent @ react-dom-client.development.js:9247
+beginWork @ react-dom-client.development.js:10807
+runWithFiberInDEV @ react-dom-client.development.js:872
+performUnitOfWork @ react-dom-client.development.js:15727
+workLoopConcurrentByScheduler @ react-dom-client.development.js:15721
+renderRootConcurrent @ react-dom-client.development.js:15696
+performWorkOnRoot @ react-dom-client.development.js:14990
+performWorkOnRootViaSchedulerTask @ react-dom-client.development.js:16816
+performWorkUntilDeadline @ scheduler.development.js:45
+(anonymous) @ inpage.js:1
+l @ inpage.js:1
+r @ inpage.js:1
+"use client"
+Promise.all @ VM223203 <anonymous>:1
+Promise.all @ VM223203 <anonymous>:1
+initializeElement @ react-server-dom-webpack-client.browser.development.js:1343
+"use server"
+ResponseInstance @ react-server-dom-webpack-client.browser.development.js:2041
+createResponseFromOptions @ react-server-dom-webpack-client.browser.development.js:3094
+exports.createFromReadableStream @ react-server-dom-webpack-client.browser.development.js:3478
+eval @ app-index.js:130
+(app-pages-browser)/./node_modules/next/dist/client/app-index.js @ main-app.js?v=1761567565885:160
+options.factory @ webpack.js:1
+__webpack_require__ @ webpack.js:1
+fn @ webpack.js:1
+eval @ app-next-dev.js:14
+eval @ app-bootstrap.js:59
+loadScriptsInSequence @ app-bootstrap.js:24
+appBootstrap @ app-bootstrap.js:53
+eval @ app-next-dev.js:13
+(app-pages-browser)/./node_modules/next/dist/client/app-next-dev.js @ main-app.js?v=1761567565885:182
+options.factory @ webpack.js:1
+__webpack_require__ @ webpack.js:1
+__webpack_exec__ @ main-app.js?v=1761567565885:1889
+(anonymous) @ main-app.js?v=1761567565885:1890
+webpackJsonpCallback @ webpack.js:1
+(anonymous) @ main-app.js?v=1761567565885:9Understand this warning
+useX402Signer.ts:313 ❌ [useX402Signer] CDP signing error: {error: Error: ❌ CDP signing failed.
+
+Smart Account: 0x44F6Db8E90B5B97fa08668Bdb2E968ad9A42e9A9
+EOA Address…, errorName: 'Error', errorMessage: '❌ CDP signing failed.\n\nSmart Account: 0x44F6Db8E90…base.com/\n- Check console for detailed error logs', errorCode: undefined, errorStack: 'Error: ❌ CDP signing failed.\n\nSmart Account: 0x44F…ress: 0x5E0008Fa547064BF1feCeF0FbF091e8Df40B59d4\n', …}
+overrideMethod @ hook.js:608
+error @ intercept-console-error.js:57
+useX402Signer.useCallback[wrappedCdpSignTypedData] @ useX402Signer.ts:313
+await in useX402Signer.useCallback[wrappedCdpSignTypedData]
+createPaymentHeader @ x402-client.ts:323
+makeX402Request @ x402-client.ts:124
+await in makeX402Request
+handleMint @ page.tsx:202
+executeDispatch @ react-dom-client.development.js:16971
+runWithFiberInDEV @ react-dom-client.development.js:872
+processDispatchQueue @ react-dom-client.development.js:17021
+eval @ react-dom-client.development.js:17622
+batchedUpdates$1 @ react-dom-client.development.js:3312
+dispatchEventForPluginEventSystem @ react-dom-client.development.js:17175
+dispatchEvent @ react-dom-client.development.js:21358
+dispatchDiscreteEvent @ react-dom-client.development.js:21326
+<button>
+exports.jsxDEV @ react-jsx-dev-runtime.development.js:323
+MintPage @ page.tsx:578
+react_stack_bottom_frame @ react-dom-client.development.js:23584
+renderWithHooksAgain @ react-dom-client.development.js:6893
+renderWithHooks @ react-dom-client.development.js:6805
+updateFunctionComponent @ react-dom-client.development.js:9247
+beginWork @ react-dom-client.development.js:10858
+runWithFiberInDEV @ react-dom-client.development.js:872
+performUnitOfWork @ react-dom-client.development.js:15727
+workLoopSync @ react-dom-client.development.js:15547
+renderRootSync @ react-dom-client.development.js:15527
+performWorkOnRoot @ react-dom-client.development.js:14991
+performWorkOnRootViaSchedulerTask @ react-dom-client.development.js:16816
+performWorkUntilDeadline @ scheduler.development.js:45
+(anonymous) @ inpage.js:1
+l @ inpage.js:1
+r @ inpage.js:1
+<MintPage>
+exports.jsx @ react-jsx-runtime.development.js:323
+ClientPageRoot @ client-page.js:20
+react_stack_bottom_frame @ react-dom-client.development.js:23584
+renderWithHooksAgain @ react-dom-client.development.js:6893
+renderWithHooks @ react-dom-client.development.js:6805
+updateFunctionComponent @ react-dom-client.development.js:9247
+beginWork @ react-dom-client.development.js:10807
+runWithFiberInDEV @ react-dom-client.development.js:872
+performUnitOfWork @ react-dom-client.development.js:15727
+workLoopConcurrentByScheduler @ react-dom-client.development.js:15721
+renderRootConcurrent @ react-dom-client.development.js:15696
+performWorkOnRoot @ react-dom-client.development.js:14990
+performWorkOnRootViaSchedulerTask @ react-dom-client.development.js:16816
+performWorkUntilDeadline @ scheduler.development.js:45
+(anonymous) @ inpage.js:1
+l @ inpage.js:1
+r @ inpage.js:1
+"use client"
+Promise.all @ VM223203 <anonymous>:1
+Promise.all @ VM223203 <anonymous>:1
+initializeElement @ react-server-dom-webpack-client.browser.development.js:1343
+"use server"
+ResponseInstance @ react-server-dom-webpack-client.browser.development.js:2041
+createResponseFromOptions @ react-server-dom-webpack-client.browser.development.js:3094
+exports.createFromReadableStream @ react-server-dom-webpack-client.browser.development.js:3478
+eval @ app-index.js:130
+(app-pages-browser)/./node_modules/next/dist/client/app-index.js @ main-app.js?v=1761567565885:160
+options.factory @ webpack.js:1
+__webpack_require__ @ webpack.js:1
+fn @ webpack.js:1
+eval @ app-next-dev.js:14
+eval @ app-bootstrap.js:59
+loadScriptsInSequence @ app-bootstrap.js:24
+appBootstrap @ app-bootstrap.js:53
+eval @ app-next-dev.js:13
+(app-pages-browser)/./node_modules/next/dist/client/app-next-dev.js @ main-app.js?v=1761567565885:182
+options.factory @ webpack.js:1
+__webpack_require__ @ webpack.js:1
+__webpack_exec__ @ main-app.js?v=1761567565885:1889
+(anonymous) @ main-app.js?v=1761567565885:1890
+webpackJsonpCallback @ webpack.js:1
+(anonymous) @ main-app.js?v=1761567565885:9Understand this error
+x402-client.ts:332 ❌ [x402-client] CDP signature rejected: Error: ❌ CDP signing failed.
+
+Smart Account: 0x44F6Db8E90B5B97fa08668Bdb2E968ad9A42e9A9
+EOA Address: 0x5E0008Fa547064BF1feCeF0FbF091e8Df40B59d4
+
+Errors encountered:
+1. Smart Account signing: EVM account not found
+2. EOA signing: Types must include EIP712Domain definition.
+
+💡 Possible solutions:
+- Verify you have USDC in your smart account
+- Try using an external wallet instead
+- Check CDP hooks documentation at https://docs.cdp.coinbase.com/
+- Check console for detailed error logs
+    at useX402Signer.useCallback[wrappedCdpSignTypedData] [as signTypedData] (useX402Signer.ts:248:19)
+    at async createPaymentHeader (x402-client.ts:343:19)
+    at async makeX402Request (x402-client.ts:124:27)
+    at async handleMint (page.tsx:202:24)
+overrideMethod @ hook.js:608
+error @ intercept-console-error.js:57
+eval @ x402-client.ts:332
+Promise.catch
+createPaymentHeader @ x402-client.ts:331
+makeX402Request @ x402-client.ts:124
+await in makeX402Request
+handleMint @ page.tsx:202
+executeDispatch @ react-dom-client.development.js:16971
+runWithFiberInDEV @ react-dom-client.development.js:872
+processDispatchQueue @ react-dom-client.development.js:17021
+eval @ react-dom-client.development.js:17622
+batchedUpdates$1 @ react-dom-client.development.js:3312
+dispatchEventForPluginEventSystem @ react-dom-client.development.js:17175
+dispatchEvent @ react-dom-client.development.js:21358
+dispatchDiscreteEvent @ react-dom-client.development.js:21326
+<button>
+exports.jsxDEV @ react-jsx-dev-runtime.development.js:323
+MintPage @ page.tsx:578
+react_stack_bottom_frame @ react-dom-client.development.js:23584
+renderWithHooksAgain @ react-dom-client.development.js:6893
+renderWithHooks @ react-dom-client.development.js:6805
+updateFunctionComponent @ react-dom-client.development.js:9247
+beginWork @ react-dom-client.development.js:10858
+runWithFiberInDEV @ react-dom-client.development.js:872
+performUnitOfWork @ react-dom-client.development.js:15727
+workLoopSync @ react-dom-client.development.js:15547
+renderRootSync @ react-dom-client.development.js:15527
+performWorkOnRoot @ react-dom-client.development.js:14991
+performWorkOnRootViaSchedulerTask @ react-dom-client.development.js:16816
+performWorkUntilDeadline @ scheduler.development.js:45
+(anonymous) @ inpage.js:1
+l @ inpage.js:1
+r @ inpage.js:1
+<MintPage>
+exports.jsx @ react-jsx-runtime.development.js:323
+ClientPageRoot @ client-page.js:20
+react_stack_bottom_frame @ react-dom-client.development.js:23584
+renderWithHooksAgain @ react-dom-client.development.js:6893
+renderWithHooks @ react-dom-client.development.js:6805
+updateFunctionComponent @ react-dom-client.development.js:9247
+beginWork @ react-dom-client.development.js:10807
+runWithFiberInDEV @ react-dom-client.development.js:872
+performUnitOfWork @ react-dom-client.development.js:15727
+workLoopConcurrentByScheduler @ react-dom-client.development.js:15721
+renderRootConcurrent @ react-dom-client.development.js:15696
+performWorkOnRoot @ react-dom-client.development.js:14990
+performWorkOnRootViaSchedulerTask @ react-dom-client.development.js:16816
+performWorkUntilDeadline @ scheduler.development.js:45
+(anonymous) @ inpage.js:1
+l @ inpage.js:1
+r @ inpage.js:1
+"use client"
+Promise.all @ VM223203 <anonymous>:1
+Promise.all @ VM223203 <anonymous>:1
+initializeElement @ react-server-dom-webpack-client.browser.development.js:1343
+"use server"
+ResponseInstance @ react-server-dom-webpack-client.browser.development.js:2041
+createResponseFromOptions @ react-server-dom-webpack-client.browser.development.js:3094
+exports.createFromReadableStream @ react-server-dom-webpack-client.browser.development.js:3478
+eval @ app-index.js:130
+(app-pages-browser)/./node_modules/next/dist/client/app-index.js @ main-app.js?v=1761567565885:160
+options.factory @ webpack.js:1
+__webpack_require__ @ webpack.js:1
+fn @ webpack.js:1
+eval @ app-next-dev.js:14
+eval @ app-bootstrap.js:59
+loadScriptsInSequence @ app-bootstrap.js:24
+appBootstrap @ app-bootstrap.js:53
+eval @ app-next-dev.js:13
+(app-pages-browser)/./node_modules/next/dist/client/app-next-dev.js @ main-app.js?v=1761567565885:182
+options.factory @ webpack.js:1
+__webpack_require__ @ webpack.js:1
+__webpack_exec__ @ main-app.js?v=1761567565885:1889
+(anonymous) @ main-app.js?v=1761567565885:1890
+webpackJsonpCallback @ webpack.js:1
+(anonymous) @ main-app.js?v=1761567565885:9Understand this error
+x402-client.ts:452 ❌ [x402-client] Signature request failed: Error: ❌ CDP signing failed.
+
+Smart Account: 0x44F6Db8E90B5B97fa08668Bdb2E968ad9A42e9A9
+EOA Address: 0x5E0008Fa547064BF1feCeF0FbF091e8Df40B59d4
+
+Errors encountered:
+1. Smart Account signing: EVM account not found
+2. EOA signing: Types must include EIP712Domain definition.
+
+💡 Possible solutions:
+- Verify you have USDC in your smart account
+- Try using an external wallet instead
+- Check CDP hooks documentation at https://docs.cdp.coinbase.com/
+- Check console for detailed error logs
+    at useX402Signer.useCallback[wrappedCdpSignTypedData] [as signTypedData] (useX402Signer.ts:248:19)
+    at async createPaymentHeader (x402-client.ts:343:19)
+    at async makeX402Request (x402-client.ts:124:27)
+    at async handleMint (page.tsx:202:24)
+overrideMethod @ hook.js:608
+error @ intercept-console-error.js:57
+createPaymentHeader @ x402-client.ts:452
+await in createPaymentHeader
+makeX402Request @ x402-client.ts:124
+await in makeX402Request
+handleMint @ page.tsx:202
+executeDispatch @ react-dom-client.development.js:16971
+runWithFiberInDEV @ react-dom-client.development.js:872
+processDispatchQueue @ react-dom-client.development.js:17021
+eval @ react-dom-client.development.js:17622
+batchedUpdates$1 @ react-dom-client.development.js:3312
+dispatchEventForPluginEventSystem @ react-dom-client.development.js:17175
+dispatchEvent @ react-dom-client.development.js:21358
+dispatchDiscreteEvent @ react-dom-client.development.js:21326
+<button>
+exports.jsxDEV @ react-jsx-dev-runtime.development.js:323
+MintPage @ page.tsx:578
+react_stack_bottom_frame @ react-dom-client.development.js:23584
+renderWithHooksAgain @ react-dom-client.development.js:6893
+renderWithHooks @ react-dom-client.development.js:6805
+updateFunctionComponent @ react-dom-client.development.js:9247
+beginWork @ react-dom-client.development.js:10858
+runWithFiberInDEV @ react-dom-client.development.js:872
+performUnitOfWork @ react-dom-client.development.js:15727
+workLoopSync @ react-dom-client.development.js:15547
+renderRootSync @ react-dom-client.development.js:15527
+performWorkOnRoot @ react-dom-client.development.js:14991
+performWorkOnRootViaSchedulerTask @ react-dom-client.development.js:16816
+performWorkUntilDeadline @ scheduler.development.js:45
+(anonymous) @ inpage.js:1
+l @ inpage.js:1
+r @ inpage.js:1
+<MintPage>
+exports.jsx @ react-jsx-runtime.development.js:323
+ClientPageRoot @ client-page.js:20
+react_stack_bottom_frame @ react-dom-client.development.js:23584
+renderWithHooksAgain @ react-dom-client.development.js:6893
+renderWithHooks @ react-dom-client.development.js:6805
+updateFunctionComponent @ react-dom-client.development.js:9247
+beginWork @ react-dom-client.development.js:10807
+runWithFiberInDEV @ react-dom-client.development.js:872
+performUnitOfWork @ react-dom-client.development.js:15727
+workLoopConcurrentByScheduler @ react-dom-client.development.js:15721
+renderRootConcurrent @ react-dom-client.development.js:15696
+performWorkOnRoot @ react-dom-client.development.js:14990
+performWorkOnRootViaSchedulerTask @ react-dom-client.development.js:16816
+performWorkUntilDeadline @ scheduler.development.js:45
+(anonymous) @ inpage.js:1
+l @ inpage.js:1
+r @ inpage.js:1
+"use client"
+Promise.all @ VM223203 <anonymous>:1
+Promise.all @ VM223203 <anonymous>:1
+initializeElement @ react-server-dom-webpack-client.browser.development.js:1343
+"use server"
+ResponseInstance @ react-server-dom-webpack-client.browser.development.js:2041
+createResponseFromOptions @ react-server-dom-webpack-client.browser.development.js:3094
+exports.createFromReadableStream @ react-server-dom-webpack-client.browser.development.js:3478
+eval @ app-index.js:130
+(app-pages-browser)/./node_modules/next/dist/client/app-index.js @ main-app.js?v=1761567565885:160
+options.factory @ webpack.js:1
+__webpack_require__ @ webpack.js:1
+fn @ webpack.js:1
+eval @ app-next-dev.js:14
+eval @ app-bootstrap.js:59
+loadScriptsInSequence @ app-bootstrap.js:24
+appBootstrap @ app-bootstrap.js:53
+eval @ app-next-dev.js:13
+(app-pages-browser)/./node_modules/next/dist/client/app-next-dev.js @ main-app.js?v=1761567565885:182
+options.factory @ webpack.js:1
+__webpack_require__ @ webpack.js:1
+__webpack_exec__ @ main-app.js?v=1761567565885:1889
+(anonymous) @ main-app.js?v=1761567565885:1890
+webpackJsonpCallback @ webpack.js:1
+(anonymous) @ main-app.js?v=1761567565885:9Understand this error
+x402-client.ts:453 ❌ [x402-client] Error details: {name: 'Error', message: '❌ CDP signing failed.\n\nSmart Account: 0x44F6Db8E90…base.com/\n- Check console for detailed error logs', code: undefined, stack: 'Error: ❌ CDP signing failed.\n\nSmart Account: 0x44F6Db8E90B5B97fa08668Bdb2E968ad9A42e9A9', Symbol(next.console.error.digest): 'NEXT_CONSOLE_ERROR'}
+overrideMethod @ hook.js:608
+error @ intercept-console-error.js:57
+createPaymentHeader @ x402-client.ts:453
+await in createPaymentHeader
+makeX402Request @ x402-client.ts:124
+await in makeX402Request
+handleMint @ page.tsx:202
+executeDispatch @ react-dom-client.development.js:16971
+runWithFiberInDEV @ react-dom-client.development.js:872
+processDispatchQueue @ react-dom-client.development.js:17021
+eval @ react-dom-client.development.js:17622
+batchedUpdates$1 @ react-dom-client.development.js:3312
+dispatchEventForPluginEventSystem @ react-dom-client.development.js:17175
+dispatchEvent @ react-dom-client.development.js:21358
+dispatchDiscreteEvent @ react-dom-client.development.js:21326
+<button>
+exports.jsxDEV @ react-jsx-dev-runtime.development.js:323
+MintPage @ page.tsx:578
+react_stack_bottom_frame @ react-dom-client.development.js:23584
+renderWithHooksAgain @ react-dom-client.development.js:6893
+renderWithHooks @ react-dom-client.development.js:6805
+updateFunctionComponent @ react-dom-client.development.js:9247
+beginWork @ react-dom-client.development.js:10858
+runWithFiberInDEV @ react-dom-client.development.js:872
+performUnitOfWork @ react-dom-client.development.js:15727
+workLoopSync @ react-dom-client.development.js:15547
+renderRootSync @ react-dom-client.development.js:15527
+performWorkOnRoot @ react-dom-client.development.js:14991
+performWorkOnRootViaSchedulerTask @ react-dom-client.development.js:16816
+performWorkUntilDeadline @ scheduler.development.js:45
+(anonymous) @ inpage.js:1
+l @ inpage.js:1
+r @ inpage.js:1
+<MintPage>
+exports.jsx @ react-jsx-runtime.development.js:323
+ClientPageRoot @ client-page.js:20
+react_stack_bottom_frame @ react-dom-client.development.js:23584
+renderWithHooksAgain @ react-dom-client.development.js:6893
+renderWithHooks @ react-dom-client.development.js:6805
+updateFunctionComponent @ react-dom-client.development.js:9247
+beginWork @ react-dom-client.development.js:10807
+runWithFiberInDEV @ react-dom-client.development.js:872
+performUnitOfWork @ react-dom-client.development.js:15727
+workLoopConcurrentByScheduler @ react-dom-client.development.js:15721
+renderRootConcurrent @ react-dom-client.development.js:15696
+performWorkOnRoot @ react-dom-client.development.js:14990
+performWorkOnRootViaSchedulerTask @ react-dom-client.development.js:16816
+performWorkUntilDeadline @ scheduler.development.js:45
+(anonymous) @ inpage.js:1
+l @ inpage.js:1
+r @ inpage.js:1
+"use client"
+Promise.all @ VM223203 <anonymous>:1
+Promise.all @ VM223203 <anonymous>:1
+initializeElement @ react-server-dom-webpack-client.browser.development.js:1343
+"use server"
+ResponseInstance @ react-server-dom-webpack-client.browser.development.js:2041
+createResponseFromOptions @ react-server-dom-webpack-client.browser.development.js:3094
+exports.createFromReadableStream @ react-server-dom-webpack-client.browser.development.js:3478
+eval @ app-index.js:130
+(app-pages-browser)/./node_modules/next/dist/client/app-index.js @ main-app.js?v=1761567565885:160
+options.factory @ webpack.js:1
+__webpack_require__ @ webpack.js:1
+fn @ webpack.js:1
+eval @ app-next-dev.js:14
+eval @ app-bootstrap.js:59
+loadScriptsInSequence @ app-bootstrap.js:24
+appBootstrap @ app-bootstrap.js:53
+eval @ app-next-dev.js:13
+(app-pages-browser)/./node_modules/next/dist/client/app-next-dev.js @ main-app.js?v=1761567565885:182
+options.factory @ webpack.js:1
+__webpack_require__ @ webpack.js:1
+__webpack_exec__ @ main-app.js?v=1761567565885:1889
+(anonymous) @ main-app.js?v=1761567565885:1890
+webpackJsonpCallback @ webpack.js:1
+(anonymous) @ main-app.js?v=1761567565885:9Understand this error
+x402-client.ts:159 ❌ [x402-client] Payment flow failed: Error: Failed to sign payment: ❌ CDP signing failed.
+
+Smart Account: 0x44F6Db8E90B5B97fa08668Bdb2E968ad9A42e9A9
+EOA Address: 0x5E0008Fa547064BF1feCeF0FbF091e8Df40B59d4
+
+Errors encountered:
+1. Smart Account signing: EVM account not found
+2. EOA signing: Types must include EIP712Domain definition.
+
+💡 Possible solutions:
+- Verify you have USDC in your smart account
+- Try using an external wallet instead
+- Check CDP hooks documentation at https://docs.cdp.coinbase.com/
+- Check console for detailed error logs. Please try again.
+    at createPaymentHeader (x402-client.ts:484:11)
+    at async makeX402Request (x402-client.ts:124:27)
+    at async handleMint (page.tsx:202:24)
+overrideMethod @ hook.js:608
+error @ intercept-console-error.js:57
+makeX402Request @ x402-client.ts:159
+await in makeX402Request
+handleMint @ page.tsx:202
+executeDispatch @ react-dom-client.development.js:16971
+runWithFiberInDEV @ react-dom-client.development.js:872
+processDispatchQueue @ react-dom-client.development.js:17021
+eval @ react-dom-client.development.js:17622
+batchedUpdates$1 @ react-dom-client.development.js:3312
+dispatchEventForPluginEventSystem @ react-dom-client.development.js:17175
+dispatchEvent @ react-dom-client.development.js:21358
+dispatchDiscreteEvent @ react-dom-client.development.js:21326
+<button>
+exports.jsxDEV @ react-jsx-dev-runtime.development.js:323
+MintPage @ page.tsx:578
+react_stack_bottom_frame @ react-dom-client.development.js:23584
+renderWithHooksAgain @ react-dom-client.development.js:6893
+renderWithHooks @ react-dom-client.development.js:6805
+updateFunctionComponent @ react-dom-client.development.js:9247
+beginWork @ react-dom-client.development.js:10858
+runWithFiberInDEV @ react-dom-client.development.js:872
+performUnitOfWork @ react-dom-client.development.js:15727
+workLoopSync @ react-dom-client.development.js:15547
+renderRootSync @ react-dom-client.development.js:15527
+performWorkOnRoot @ react-dom-client.development.js:14991
+performWorkOnRootViaSchedulerTask @ react-dom-client.development.js:16816
+performWorkUntilDeadline @ scheduler.development.js:45
+(anonymous) @ inpage.js:1
+l @ inpage.js:1
+r @ inpage.js:1
+<MintPage>
+exports.jsx @ react-jsx-runtime.development.js:323
+ClientPageRoot @ client-page.js:20
+react_stack_bottom_frame @ react-dom-client.development.js:23584
+renderWithHooksAgain @ react-dom-client.development.js:6893
+renderWithHooks @ react-dom-client.development.js:6805
+updateFunctionComponent @ react-dom-client.development.js:9247
+beginWork @ react-dom-client.development.js:10807
+runWithFiberInDEV @ react-dom-client.development.js:872
+performUnitOfWork @ react-dom-client.development.js:15727
+workLoopConcurrentByScheduler @ react-dom-client.development.js:15721
+renderRootConcurrent @ react-dom-client.development.js:15696
+performWorkOnRoot @ react-dom-client.development.js:14990
+performWorkOnRootViaSchedulerTask @ react-dom-client.development.js:16816
+performWorkUntilDeadline @ scheduler.development.js:45
+(anonymous) @ inpage.js:1
+l @ inpage.js:1
+r @ inpage.js:1
+"use client"
+Promise.all @ VM223203 <anonymous>:1
+Promise.all @ VM223203 <anonymous>:1
+initializeElement @ react-server-dom-webpack-client.browser.development.js:1343
+"use server"
+ResponseInstance @ react-server-dom-webpack-client.browser.development.js:2041
+createResponseFromOptions @ react-server-dom-webpack-client.browser.development.js:3094
+exports.createFromReadableStream @ react-server-dom-webpack-client.browser.development.js:3478
+eval @ app-index.js:130
+(app-pages-browser)/./node_modules/next/dist/client/app-index.js @ main-app.js?v=1761567565885:160
+options.factory @ webpack.js:1
+__webpack_require__ @ webpack.js:1
+fn @ webpack.js:1
+eval @ app-next-dev.js:14
+eval @ app-bootstrap.js:59
+loadScriptsInSequence @ app-bootstrap.js:24
+appBootstrap @ app-bootstrap.js:53
+eval @ app-next-dev.js:13
+(app-pages-browser)/./node_modules/next/dist/client/app-next-dev.js @ main-app.js?v=1761567565885:182
+options.factory @ webpack.js:1
+__webpack_require__ @ webpack.js:1
+__webpack_exec__ @ main-app.js?v=1761567565885:1889
+(anonymous) @ main-app.js?v=1761567565885:1890
+webpackJsonpCallback @ webpack.js:1
+(anonymous) @ main-app.js?v=1761567565885:9Understand this error
+x402-client.ts:160 ❌ [x402-client] Error stack: Error: Failed to sign payment: ❌ CDP signing failed.
+
+Smart Account: 0x44F6Db8E90B5B97fa08668Bdb2E968ad9A42e9A9
+EOA Address: 0x5E0008Fa547064BF1feCeF0FbF091e8Df40B59d4
+
+Errors encountered:
+1. Smart Account signing: EVM account not found
+2. EOA signing: Types must include EIP712Domain definition.
+
+💡 Possible solutions:
+- Verify you have USDC in your smart account
+- Try using an external wallet instead
+- Check CDP hooks documentation at https://docs.cdp.coinbase.com/
+- Check console for detailed error logs. Please try again.
+    at createPaymentHeader (webpack-internal:///(app-pages-browser)/./src/lib/x402-client.ts:335:15)
+    at async makeX402Request (webpack-internal:///(app-pages-browser)/./src/lib/x402-client.ts:72:31)
+    at async handleMint (webpack-internal:///(app-pages-browser)/./src/app/mint/page.tsx:202:30)
+overrideMethod @ hook.js:608
+error @ intercept-console-error.js:57
+makeX402Request @ x402-client.ts:160
+await in makeX402Request
+handleMint @ page.tsx:202
+executeDispatch @ react-dom-client.development.js:16971
+runWithFiberInDEV @ react-dom-client.development.js:872
+processDispatchQueue @ react-dom-client.development.js:17021
+eval @ react-dom-client.development.js:17622
+batchedUpdates$1 @ react-dom-client.development.js:3312
+dispatchEventForPluginEventSystem @ react-dom-client.development.js:17175
+dispatchEvent @ react-dom-client.development.js:21358
+dispatchDiscreteEvent @ react-dom-client.development.js:21326
+<button>
+exports.jsxDEV @ react-jsx-dev-runtime.development.js:323
+MintPage @ page.tsx:578
+react_stack_bottom_frame @ react-dom-client.development.js:23584
+renderWithHooksAgain @ react-dom-client.development.js:6893
+renderWithHooks @ react-dom-client.development.js:6805
+updateFunctionComponent @ react-dom-client.development.js:9247
+beginWork @ react-dom-client.development.js:10858
+runWithFiberInDEV @ react-dom-client.development.js:872
+performUnitOfWork @ react-dom-client.development.js:15727
+workLoopSync @ react-dom-client.development.js:15547
+renderRootSync @ react-dom-client.development.js:15527
+performWorkOnRoot @ react-dom-client.development.js:14991
+performWorkOnRootViaSchedulerTask @ react-dom-client.development.js:16816
+performWorkUntilDeadline @ scheduler.development.js:45
+(anonymous) @ inpage.js:1
+l @ inpage.js:1
+r @ inpage.js:1
+<MintPage>
+exports.jsx @ react-jsx-runtime.development.js:323
+ClientPageRoot @ client-page.js:20
+react_stack_bottom_frame @ react-dom-client.development.js:23584
+renderWithHooksAgain @ react-dom-client.development.js:6893
+renderWithHooks @ react-dom-client.development.js:6805
+updateFunctionComponent @ react-dom-client.development.js:9247
+beginWork @ react-dom-client.development.js:10807
+runWithFiberInDEV @ react-dom-client.development.js:872
+performUnitOfWork @ react-dom-client.development.js:15727
+workLoopConcurrentByScheduler @ react-dom-client.development.js:15721
+renderRootConcurrent @ react-dom-client.development.js:15696
+performWorkOnRoot @ react-dom-client.development.js:14990
+performWorkOnRootViaSchedulerTask @ react-dom-client.development.js:16816
+performWorkUntilDeadline @ scheduler.development.js:45
+(anonymous) @ inpage.js:1
+l @ inpage.js:1
+r @ inpage.js:1
+"use client"
+Promise.all @ VM223203 <anonymous>:1
+Promise.all @ VM223203 <anonymous>:1
+initializeElement @ react-server-dom-webpack-client.browser.development.js:1343
+"use server"
+ResponseInstance @ react-server-dom-webpack-client.browser.development.js:2041
+createResponseFromOptions @ react-server-dom-webpack-client.browser.development.js:3094
+exports.createFromReadableStream @ react-server-dom-webpack-client.browser.development.js:3478
+eval @ app-index.js:130
+(app-pages-browser)/./node_modules/next/dist/client/app-index.js @ main-app.js?v=1761567565885:160
+options.factory @ webpack.js:1
+__webpack_require__ @ webpack.js:1
+fn @ webpack.js:1
+eval @ app-next-dev.js:14
+eval @ app-bootstrap.js:59
+loadScriptsInSequence @ app-bootstrap.js:24
+appBootstrap @ app-bootstrap.js:53
+eval @ app-next-dev.js:13
+(app-pages-browser)/./node_modules/next/dist/client/app-next-dev.js @ main-app.js?v=1761567565885:182
+options.factory @ webpack.js:1
+__webpack_require__ @ webpack.js:1
+__webpack_exec__ @ main-app.js?v=1761567565885:1889
+(anonymous) @ main-app.js?v=1761567565885:1890
+webpackJsonpCallback @ webpack.js:1
+(anonymous) @ main-app.js?v=1761567565885:9Understand this error
+page.tsx:267 ❌ Mint failed: Error: Failed to sign payment: ❌ CDP signing failed.
+
+Smart Account: 0x44F6Db8E90B5B97fa08668Bdb2E968ad9A42e9A9
+EOA Address: 0x5E0008Fa547064BF1feCeF0FbF091e8Df40B59d4
+
+Errors encountered:
+1. Smart Account signing: EVM account not found
+2. EOA signing: Types must include EIP712Domain definition.
+
+💡 Possible solutions:
+- Verify you have USDC in your smart account
+- Try using an external wallet instead
+- Check CDP hooks documentation at https://docs.cdp.coinbase.com/
+- Check console for detailed error logs. Please try again.
+    at createPaymentHeader (x402-client.ts:484:11)
+    at async makeX402Request (x402-client.ts:124:27)
+    at async handleMint (page.tsx:202:24)
+overrideMethod @ hook.js:608
+error @ intercept-console-error.js:57
+handleMint @ page.tsx:267
+await in handleMint
+executeDispatch @ react-dom-client.development.js:16971
+runWithFiberInDEV @ react-dom-client.development.js:872
+processDispatchQueue @ react-dom-client.development.js:17021
+eval @ react-dom-client.development.js:17622
+batchedUpdates$1 @ react-dom-client.development.js:3312
+dispatchEventForPluginEventSystem @ react-dom-client.development.js:17175
+dispatchEvent @ react-dom-client.development.js:21358
+dispatchDiscreteEvent @ react-dom-client.development.js:21326
+<button>
+exports.jsxDEV @ react-jsx-dev-runtime.development.js:323
+MintPage @ page.tsx:578
+react_stack_bottom_frame @ react-dom-client.development.js:23584
+renderWithHooksAgain @ react-dom-client.development.js:6893
+renderWithHooks @ react-dom-client.development.js:6805
+updateFunctionComponent @ react-dom-client.development.js:9247
+beginWork @ react-dom-client.development.js:10858
+runWithFiberInDEV @ react-dom-client.development.js:872
+performUnitOfWork @ react-dom-client.development.js:15727
+workLoopSync @ react-dom-client.development.js:15547
+renderRootSync @ react-dom-client.development.js:15527
+performWorkOnRoot @ react-dom-client.development.js:14991
+performWorkOnRootViaSchedulerTask @ react-dom-client.development.js:16816
+performWorkUntilDeadline @ scheduler.development.js:45
+(anonymous) @ inpage.js:1
+l @ inpage.js:1
+r @ inpage.js:1
+<MintPage>
+exports.jsx @ react-jsx-runtime.development.js:323
+ClientPageRoot @ client-page.js:20
+react_stack_bottom_frame @ react-dom-client.development.js:23584
+renderWithHooksAgain @ react-dom-client.development.js:6893
+renderWithHooks @ react-dom-client.development.js:6805
+updateFunctionComponent @ react-dom-client.development.js:9247
+beginWork @ react-dom-client.development.js:10807
+runWithFiberInDEV @ react-dom-client.development.js:872
+performUnitOfWork @ react-dom-client.development.js:15727
+workLoopConcurrentByScheduler @ react-dom-client.development.js:15721
+renderRootConcurrent @ react-dom-client.development.js:15696
+performWorkOnRoot @ react-dom-client.development.js:14990
+performWorkOnRootViaSchedulerTask @ react-dom-client.development.js:16816
+performWorkUntilDeadline @ scheduler.development.js:45
+(anonymous) @ inpage.js:1
+l @ inpage.js:1
+r @ inpage.js:1
+"use client"
+Promise.all @ VM223203 <anonymous>:1
+Promise.all @ VM223203 <anonymous>:1
+initializeElement @ react-server-dom-webpack-client.browser.development.js:1343
+"use server"
+ResponseInstance @ react-server-dom-webpack-client.browser.development.js:2041
+createResponseFromOptions @ react-server-dom-webpack-client.browser.development.js:3094
+exports.createFromReadableStream @ react-server-dom-webpack-client.browser.development.js:3478
+eval @ app-index.js:130
+(app-pages-browser)/./node_modules/next/dist/client/app-index.js @ main-app.js?v=1761567565885:160
+options.factory @ webpack.js:1
+__webpack_require__ @ webpack.js:1
+fn @ webpack.js:1
+eval @ app-next-dev.js:14
+eval @ app-bootstrap.js:59
+loadScriptsInSequence @ app-bootstrap.js:24
+appBootstrap @ app-bootstrap.js:53
+eval @ app-next-dev.js:13
+(app-pages-browser)/./node_modules/next/dist/client/app-next-dev.js @ main-app.js?v=1761567565885:182
+options.factory @ webpack.js:1
+__webpack_require__ @ webpack.js:1
+__webpack_exec__ @ main-app.js?v=1761567565885:1889
+(anonymous) @ main-app.js?v=1761567565885:1890
+webpackJsonpCallback @ webpack.js:1
+(anonymous) @ main-app.js?v=1761567565885:9Understand this error
+useX402Signer.ts:30 🔍 [useX402Signer] Using CDP smart account wallet {walletType: 'embedded', address: '0x44F6Db8E90B5B97fa08668Bdb2E968ad9A42e9A9', smartAccountAddress: '0x44F6Db8E90B5B97fa08668Bdb2E968ad9A42e9A9', eoaAddress: '0x5E0008Fa547064BF1feCeF0FbF091e8Df40B59d4', hasSignTypedData: true, …}
+useX402Signer.ts:30 🔍 [useX402Signer] Using CDP smart account wallet {walletType: 'embedded', address: '0x44F6Db8E90B5B97fa08668Bdb2E968ad9A42e9A9', smartAccountAddress: '0x44F6Db8E90B5B97fa08668Bdb2E968ad9A42e9A9', eoaAddress: '0x5E0008Fa547064BF1feCeF0FbF091e8Df40B59d4', hasSignTypedData: true, …}

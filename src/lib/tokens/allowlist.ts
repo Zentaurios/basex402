@@ -155,12 +155,37 @@ export function isTokenAllowedByAddress(
 }
 
 /**
- * Check if a token is native (ETH/SOL) based on missing contract address
+ * Common contract address placeholders for native tokens
+ * These addresses are used by various APIs to represent native ETH/SOL
+ */
+const NATIVE_ETH_ADDRESSES = [
+  '0x0000000000000000000000000000000000000000', // Zero address
+  '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', // ERC-7528 standard
+  '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', // Mixed case (CDP uses this)
+  'native',                                      // Explicit 'native' string
+].map(addr => addr.toLowerCase());
+
+/**
+ * Check if a token is native (ETH/SOL) based on symbol and address
  */
 export function isNativeToken(
   symbol: string | undefined,
   address: string | undefined
 ): boolean {
-  if (address) return false; // Has contract address, not native
-  return symbol === 'ETH' || symbol === 'SOL' || symbol === 'Ethereum' || symbol === 'Solana';
+  // Check if symbol indicates native token
+  const isNativeSymbol = symbol === 'ETH' || symbol === 'SOL' || symbol === 'Ethereum' || symbol === 'Solana';
+  
+  // If no address, check symbol
+  if (!address) {
+    return isNativeSymbol;
+  }
+  
+  // Check if address is a known native token placeholder
+  const normalizedAddress = address.toLowerCase();
+  const isNativeAddress = NATIVE_ETH_ADDRESSES.includes(normalizedAddress);
+  
+  // A token is native if:
+  // 1. It has a native placeholder address, OR
+  // 2. It has a native symbol AND no standard contract address
+  return isNativeAddress || (isNativeSymbol && !address);
 }

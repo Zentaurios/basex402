@@ -138,7 +138,7 @@ export function PaymentFlow({ template, onSuccess, onCancel }: PaymentFlowProps)
           type: "eip1559",
         },
         evmAccount: evmAddress!,
-        network: (isMainnet ? "base-mainnet" : "base-sepolia") as any,
+        network: (isMainnet ? "base" : "base-sepolia") as any,
       });
 
       setPaymentTxHash(transactionHash);

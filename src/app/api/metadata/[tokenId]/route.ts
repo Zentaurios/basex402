@@ -1,7 +1,7 @@
 // Simplified hardcoded metadata - no database needed!
 import { NextRequest, NextResponse } from 'next/server';
-import { createPublicClient, http, getContract } from 'viem';
-import { base, baseSepolia } from 'viem/chains';
+import { getContract } from 'viem';
+import { createPublicRpcClient } from '@/lib/rpc-config';
 import { isMainnet } from '@/lib/network-config';
 
 // Contract ABI - just the functions we need
@@ -43,18 +43,8 @@ const CONTRACT_ABI = [
 // Contract address (you'll set this after deployment)
 const CONTRACT_ADDRESS = process.env.NFT_CONTRACT_ADDRESS as `0x${string}`;
 
-// Create viem client
-const getClient = () => {
-  const chain = isMainnet() ? base : baseSepolia;
-  const rpcUrl = isMainnet() 
-    ? process.env.NEXT_PUBLIC_BASE_MAINNET_RPC 
-    : process.env.NEXT_PUBLIC_BASE_SEPOLIA_RPC;
-    
-  return createPublicClient({
-    chain,
-    transport: http(rpcUrl)
-  });
-};
+// Create viem client (using centralized RPC config)
+const getClient = createPublicRpcClient;
 
 // Production domain for NFT metadata (hardcoded to ensure permanence)
 const PRODUCTION_DOMAIN = "https://basex402.com";

@@ -3,9 +3,11 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { AuthButton } from '@coinbase/cdp-react/components/AuthButton';
-import { Wallet, ConnectWallet } from '@coinbase/onchainkit/wallet';
 import { Mail, Link as LinkIcon } from 'lucide-react';
 import { useWallet } from './WalletProvider';
+import { useAccount, useDisconnect } from 'wagmi';
+import { OnchainKitWalletBridge } from '@/components/wallet/OnchainKitWalletBridge';
+import { ExternalWalletConnect } from './ExternalWalletConnect';
 
 type LoginMethod = 'embedded' | 'external';
 
@@ -14,6 +16,10 @@ export function GlobalWalletModal() {
   const [selectedMethod, setSelectedMethod] = useState<LoginMethod>('embedded');
   const [mounted, setMounted] = useState(false);
   const [wasConnectedOnOpen, setWasConnectedOnOpen] = useState(false);
+  
+  // Get wagmi state to check for external wallet connections
+  const { isConnected: isWagmiConnected } = useAccount();
+  const { disconnect } = useDisconnect();
 
   useEffect(() => {
     setMounted(true);
@@ -26,19 +32,38 @@ export function GlobalWalletModal() {
     }
   }, [isModalOpen, isConnected]);
 
-  // Only close modal if wallet connects AFTER modal was opened while disconnected
+  // Close modal when external wallet connects
+  useEffect(() => {
+    if (isModalOpen && isWagmiConnected && selectedMethod === 'external' && !wasConnectedOnOpen) {
+      console.log('✅ External wallet connected, closing modal');
+      closeModal();
+    }
+  }, [isWagmiConnected, isModalOpen, selectedMethod, wasConnectedOnOpen, closeModal]);
+  
+  // Also close if custom provider detects connection
   useEffect(() => {
     if (isModalOpen && isConnected && !wasConnectedOnOpen) {
+      console.log('✅ Wallet connected via custom provider, closing modal');
       closeModal();
     }
   }, [isConnected, isModalOpen, wasConnectedOnOpen, closeModal]);
+  
+  // Disconnect wagmi when switching to embedded wallet tab
+  useEffect(() => {
+    if (selectedMethod === 'embedded' && isWagmiConnected) {
+      console.log('🔄 Switching to embedded wallet, disconnecting external wallet');
+      disconnect();
+    }
+  }, [selectedMethod, isWagmiConnected, disconnect]);
 
   if (!mounted || !isModalOpen) {
     return null;
   }
 
   const modalContent = (
-    <div 
+    <>
+      <OnchainKitWalletBridge />
+      <div 
       className="fixed inset-0 z-[9998] flex items-center justify-center p-4 overflow-y-auto"
       style={{ backgroundColor: 'rgba(0, 0, 0, 0.75)' }}
       onClick={closeModal}
@@ -88,35 +113,40 @@ export function GlobalWalletModal() {
           </button>
         </div>
 
-        {/* Tab Content */}
-        <div className="p-6">
-          {selectedMethod === 'embedded' ? (
+        {/* Tab Content - Only render the active tab to avoid authentication conflicts */}
+        <div className="p-6" key={selectedMethod}>
+          {selectedMethod === 'embedded' && (
             <div className="space-y-4">
               <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>
                 Create a wallet instantly using your email. No extensions or seed phrases needed.
               </p>
-              <div className="flex justify-center py-4">
-                <AuthButton />
+              <div className="space-y-3">
+                <div 
+                  className="w-full flex items-center justify-center px-4 py-3 rounded-lg border"
+                  style={{
+                    backgroundColor: 'var(--surface)',
+                    borderColor: 'var(--card-border)',
+                  }}
+                >
+                  <AuthButton />
+                </div>
               </div>
               <div className="text-xs text-center mt-6" style={{ color: 'var(--text-muted)' }}>
                 If you do not have one, a wallet will be created automatically
               </div>
             </div>
-          ) : (
+          )}
+          
+          {selectedMethod === 'external' && (
             <div className="space-y-4">
               <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>
-                Connect using Coinbase Wallet, MetaMask, Phantom, or any wallet via WalletConnect.
+                Connect using Coinbase Wallet, MetaMask, or other wallets.
               </p>
-              <div className="flex justify-center py-4">
-                <Wallet>
-                  <ConnectWallet 
-                    disconnectedLabel="Connect Wallet"
-                    className="ock-wallet-button"
-                  />
-                </Wallet>
+              <div className="py-2">
+                <ExternalWalletConnect />
               </div>
               <div className="text-xs text-center mt-6" style={{ color: 'var(--text-muted)' }}>
-                Supports Coinbase Wallet, MetaMask, Phantom & more
+                Coinbase Wallet, MetaMask, and Phantom supported
               </div>
             </div>
           )}
@@ -137,6 +167,7 @@ export function GlobalWalletModal() {
         </div>
       </div>
     </div>
+    </>
   );
 
   return createPortal(modalContent, document.body);

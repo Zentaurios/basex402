@@ -48,7 +48,7 @@ const AIRDROP_ABI = [
     "stateMutability": "view",
     "type": "function"
   }
-] as const;
+];
 
 interface AirdropResult {
   success: boolean;

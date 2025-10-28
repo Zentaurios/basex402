@@ -1,14 +1,11 @@
 'use server';
 
-import { createPublicClient, http } from 'viem';
-import { base, baseSepolia } from 'viem/chains';
-
-const isMainnet = process.env.NEXT_PUBLIC_ENABLE_MAINNET === 'true';
+import { createPublicRpcClient, RPC_CONFIG } from '@/lib/rpc-config';
 
 // Contract addresses
-const CONTRACT_ADDRESS = isMainnet 
-  ? (process.env.NEXT_PUBLIC_NFT_CONTRACT_ADDRESS as `0x${string}`) || '0x362EbDDb00933852D80eBDCc8fA6c969dAE5268C' as `0x${string}`
-  : (process.env.NEXT_PUBLIC_NFT_CONTRACT_ADDRESS_TESTNET as `0x${string}`);
+const CONTRACT_ADDRESS = RPC_CONFIG.isMainnet 
+  ? (process.env.NFT_CONTRACT_ADDRESS as `0x${string}`) || '0x362EbDDb00933852D80eBDCc8fA6c969dAE5268C' as `0x${string}`
+  : (process.env.NFT_CONTRACT_ADDRESS_TESTNET as `0x${string}`);
 
 const MAX_PUBLIC_SUPPLY = 402;
 
@@ -30,19 +27,12 @@ const CONTRACT_ABI = [
   },
 ] as const;
 
-// Create public client for reading contract data
-const publicClient = createPublicClient({
-  chain: isMainnet ? base : baseSepolia,
-  transport: http(),
-});
-
 /**
  * Get current contract statistics
  */
 export async function getContractStats() {
   try {
     if (!CONTRACT_ADDRESS) {
-      console.warn('Contract address not configured');
       return {
         totalSupply: 0,
         maxSupply: MAX_PUBLIC_SUPPLY,
@@ -50,6 +40,9 @@ export async function getContractStats() {
         nextTokenId: 1,
       };
     }
+
+    // Create public client with retry logic
+    const publicClient = createPublicRpcClient();
 
     const totalSupply = await publicClient.readContract({
       address: CONTRACT_ADDRESS,
@@ -68,8 +61,7 @@ export async function getContractStats() {
       nextTokenId,
     };
   } catch (error) {
-    console.error('Error fetching contract stats:', error);
-    // Return fallback data on error
+    // Return fallback data on error (don't crash the app)
     return {
       totalSupply: 0,
       maxSupply: MAX_PUBLIC_SUPPLY,
@@ -88,6 +80,8 @@ export async function getWalletMintCount(walletAddress: string) {
       return 0;
     }
 
+    const publicClient = createPublicRpcClient();
+
     const count = await publicClient.readContract({
       address: CONTRACT_ADDRESS,
       abi: CONTRACT_ABI,
@@ -97,7 +91,6 @@ export async function getWalletMintCount(walletAddress: string) {
 
     return Number(count);
   } catch (error) {
-    console.error('Error fetching wallet mint count:', error);
     return 0;
   }
 }

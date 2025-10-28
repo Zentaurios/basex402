@@ -138,7 +138,7 @@ async function main() {
       transaction: {
         // For contract deployment, don't include 'to' field
         data: deployBytecode,
-        value: '0x0', // Hex format for 0
+        value: 0n, // Hex format for 0
       },
     });
 
@@ -201,7 +201,7 @@ async function main() {
     transaction: {
       to: contractAddress,
       data: transferData,
-      value: '0x0'
+      value: 0n
     }
   });
 

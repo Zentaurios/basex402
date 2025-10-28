@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useDisconnect } from 'wagmi';
 import { useTokenBalances } from './shared/useTokenBalances';
 import { AssetsDisplay } from './shared/AssetsDisplay';
+import { NFTsDisplay, useNFTBalances } from './shared';
 import { SendTab } from './SendTab';
 import { 
   Wallet as WalletIcon, 
@@ -20,13 +20,27 @@ interface ConnectedWalletProps {
 }
 
 export function ConnectedWallet({ isMobileMenu = false }: ConnectedWalletProps) {
-  const { isConnected, walletType, address } = useWallet();
-  const { disconnect } = useDisconnect();
+  const { isConnected, walletType, address, customDisconnect } = useWallet();
   
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'assets' | 'nfts' | 'send'>('assets');
   const [copied, setCopied] = useState(false);
   const [showUnverified, setShowUnverified] = useState(false);
+  
+  // Debug logging
+  useEffect(() => {
+    console.log('🔍 ConnectedWallet rendered:', {
+      isConnected,
+      walletType,
+      address,
+      component: 'ConnectedWallet'
+    });
+  }, [isConnected, walletType, address]);
+  
+  // Log dropdown state changes
+  useEffect(() => {
+    console.log('📋 ConnectedWallet dropdown state:', isDropdownOpen);
+  }, [isDropdownOpen]);
   
   // Fetch balances for external wallet when dropdown is open
   const { balances: externalBalances, loading: externalBalancesLoading } = useTokenBalances(
@@ -35,7 +49,20 @@ export function ConnectedWallet({ isMobileMenu = false }: ConnectedWalletProps) 
     walletType === 'external' && isDropdownOpen
   );
   
+  // Fetch NFTs for external wallet when NFT tab is active
+  const { nfts, loading: loadingNFTs } = useNFTBalances(
+    address,
+    walletType === 'external' && isDropdownOpen && activeTab === 'nfts'
+  );
+  
   const dropdownRef = useRef<HTMLDivElement>(null);
+  
+  // Close dropdown when wallet disconnects
+  useEffect(() => {
+    if (!isConnected) {
+      setIsDropdownOpen(false);
+    }
+  }, [isConnected]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -66,6 +93,14 @@ export function ConnectedWallet({ isMobileMenu = false }: ConnectedWalletProps) 
     }
   };
 
+  const handleDisconnect = async () => {
+    // Close dropdown immediately
+    setIsDropdownOpen(false);
+    
+    // Use custom disconnect function that clears OnchainKit FIRST, then wagmi
+    await customDisconnect();
+  };
+
   const formatAddress = (addr?: string | null) => {
     if (!addr) return '';
     return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
@@ -86,7 +121,10 @@ export function ConnectedWallet({ isMobileMenu = false }: ConnectedWalletProps) 
     <div className="relative" ref={dropdownRef}>
       {/* Connect Button - matches WalletDropdown mobile styles */}
       <button
-        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+        onClick={() => {
+          console.log('👆 ConnectedWallet button clicked, toggling dropdown:', !isDropdownOpen);
+          setIsDropdownOpen(!isDropdownOpen);
+        }}
         className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors hover:bg-opacity-80 ${
           isMobileMenu ? 'w-full justify-between' : ''
         }`}
@@ -201,9 +239,10 @@ export function ConnectedWallet({ isMobileMenu = false }: ConnectedWalletProps) 
               />
             )}
             {activeTab === 'nfts' && (
-              <div className="text-center py-8 text-xs" style={{ color: 'var(--text-secondary)' }}>
-                NFTs coming soon
-              </div>
+              <NFTsDisplay
+                nfts={nfts}
+                loading={loadingNFTs}
+              />
             )}
             {activeTab === 'send' && (
               <SendTab
@@ -217,10 +256,7 @@ export function ConnectedWallet({ isMobileMenu = false }: ConnectedWalletProps) 
           {/* Footer Actions */}
           <div className="p-4 border-t space-y-2" style={{ borderColor: 'var(--card-border)' }}>
             <button
-              onClick={() => {
-                disconnect();
-                setIsDropdownOpen(false);
-              }}
+              onClick={handleDisconnect}
               className="w-full flex items-center justify-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-opacity-80"
               style={{ backgroundColor: 'var(--surface)', color: 'var(--text-primary)' }}
             >

@@ -134,7 +134,7 @@ export async function getWalletInfo(): Promise<WalletInfo | null> {
     const walletInfo: WalletInfo = {
       address: typeof account === 'string' ? account : account,
       balance: '0', // TODO: Implement balance fetching
-      network: process.env.NEXT_PUBLIC_ENABLE_MAINNET === 'true' ? 'base-mainnet' : 'base-sepolia',
+      network: process.env.NEXT_PUBLIC_ENABLE_MAINNET === 'true' ? 'base' : 'base-sepolia',
       isConnected: true
     };
 

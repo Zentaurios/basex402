@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { EmbeddedWalletHeader } from '@/components/auth/EmbeddedWalletHeader';
+import { UnifiedWalletHeader } from '@/components/wallet/UnifiedWalletHeader';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useState } from 'react';
 
@@ -139,9 +139,9 @@ export function Header({ isMainnet, networkName }: HeaderProps) {
                 <ThemeToggle />
               </div>
               
-              {/* Embedded Wallet Status - Hidden on mobile, shown on desktop */}
+              {/* Wallet Status - Hidden on mobile, shown on desktop */}
               <div className="hidden md:block">
-                <EmbeddedWalletHeader />
+                <UnifiedWalletHeader />
               </div>
               
               {/* Mobile menu button */}
@@ -198,7 +198,7 @@ export function Header({ isMainnet, networkName }: HeaderProps) {
           <div className="px-4 py-4 space-y-3">
             {/* Wallet - First item in mobile menu */}
             <div className="mb-4">
-              <EmbeddedWalletHeader isMobileMenu={true} />
+              <UnifiedWalletHeader isMobileMenu={true} />
             </div>
             <Link 
               href="/" 

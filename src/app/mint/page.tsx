@@ -6,9 +6,10 @@ import { useWallet } from '@/components/wallet/WalletProvider';
 import { WalletButton } from '@/components/wallet/WalletButton';
 import { useState, useEffect } from 'react';
 import { getContractStats } from '@/app/actions/contract-stats';
-import { useAccount } from 'wagmi';
-import { useWalletClient } from 'wagmi';
-import { makeX402Request } from '@/lib/x402-client';
+import { useAccount, useSwitchChain, useChainId } from 'wagmi';
+import { makeX402Request, type X402Signer } from '@/lib/x402-client';
+import toast from 'react-hot-toast';
+import { useX402Signer } from '@/hooks/useX402Signer';
 
 // Force dynamic rendering - no static generation or caching
 export const dynamic = 'force-dynamic';
@@ -19,27 +20,27 @@ const networkName = isMainnet ? 'Base' : 'Base Sepolia';
 
 // Determine rarity tier for next mint
 function getRarityTier(tokenId: number) {
-  if (tokenId <= 10) return { 
-    name: 'Genesis', 
-    color: 'from-yellow-400 to-yellow-600', 
+  if (tokenId <= 10) return {
+    name: 'Genesis',
+    color: 'from-yellow-400 to-yellow-600',
     emoji: '🏆',
     animation: '/animations/genesis.gif'
   };
-  if (tokenId <= 100) return { 
-    name: 'Pioneer', 
-    color: 'from-gray-300 to-gray-500', 
+  if (tokenId <= 100) return {
+    name: 'Pioneer',
+    color: 'from-gray-300 to-gray-500',
     emoji: '🚀',
     animation: '/animations/pioneer.gif'
   };
-  if (tokenId <= 300) return { 
-    name: 'Early Adopter', 
-    color: 'from-orange-400 to-orange-600', 
+  if (tokenId <= 225) return {
+    name: 'Early Adopter',
+    color: 'from-orange-400 to-orange-600',
     emoji: '⚡',
     animation: '/animations/early-adopter.gif'
   };
-  return { 
-    name: 'Protocol User', 
-    color: 'from-blue-400 to-blue-600', 
+  return {
+    name: 'Protocol User',
+    color: 'from-blue-400 to-blue-600',
     emoji: '💎',
     animation: '/animations/protocol-user.gif'
   };
@@ -48,13 +49,24 @@ function getRarityTier(tokenId: number) {
 export default function MintPage() {
   const { isConnected, address, walletType } = useWallet();
   const { connector } = useAccount();
-  const { data: walletClient } = useWalletClient();
+  // Chain management for external wallets
+  const currentChainId = useChainId();
+  const { switchChain, isPending: isSwitchingChain } = useSwitchChain();
+
+  // ✅ NEW: Use x402 signer that works for both embedded (CDP) and external (wagmi) wallets
+  const signer = useX402Signer();
   
+  // Extract signer properties safely with optional chaining
+  const walletClient = signer?.walletClient;
+  const signTypedData = signer?.signTypedData;
+  const signerAddress = signer?.address;
+  const isWalletClientLoading = signer?.isLoading ?? true;
+
   const [mintStep, setMintStep] = useState<'wallet' | 'mint' | 'success'>('wallet');
   const [isMinting, setIsMinting] = useState(false);
   const [mintResult, setMintResult] = useState<any>(null);
   const [quantity, setQuantity] = useState(1);
-  
+
   // Contract stats state
   const [contractStats, setContractStats] = useState<{
     totalSupply: number;
@@ -63,7 +75,7 @@ export default function MintPage() {
     nextTokenId: number;
   } | null>(null);
   const [isLoadingStats, setIsLoadingStats] = useState(true);
-  
+
   // Calculate max mintable based on remaining supply
   const maxMintable = Math.min(5, contractStats?.remaining || 0);
   const TOTAL_SUPPLY = contractStats?.maxSupply || 402;
@@ -80,8 +92,6 @@ export default function MintPage() {
       try {
         const stats = await getContractStats();
         setContractStats(stats);
-      } catch (error) {
-        console.error('Failed to fetch contract stats:', error);
       } finally {
         setIsLoadingStats(false);
       }
@@ -92,16 +102,16 @@ export default function MintPage() {
   // Update mint step based on wallet connection
   useEffect(() => {
     // Check if user just signed out
-    const forceSignout = typeof window !== 'undefined' && 
-      (localStorage.getItem('cdp-force-signout') === 'true' || 
-       sessionStorage.getItem('cdp-force-signout') === 'true');
-    
+    const forceSignout = typeof window !== 'undefined' &&
+      (localStorage.getItem('cdp-force-signout') === 'true' ||
+        sessionStorage.getItem('cdp-force-signout') === 'true');
+
     if (forceSignout) {
       // Keep on wallet step if sign out is in progress
       setMintStep('wallet');
       return;
     }
-    
+
     if (isConnected && address) {
       if (mintStep === 'wallet') {
         setMintStep('mint');
@@ -112,18 +122,89 @@ export default function MintPage() {
   }, [isConnected, address, mintStep]);
 
   const handleMint = async () => {
-    if (!address) return;
-    
-    if (!walletClient) {
-      alert('Wallet client not ready. Please reconnect your wallet.');
+    if (!address) {
+      toast.error('Please connect your wallet first');
       return;
     }
-    
+
+    // Wait for signer to be ready if still loading
+    if (isWalletClientLoading) {
+      toast.error('Wallet is still initializing, please wait...');
+      return;
+    }
+
+    // ✅ NEW: Check if signer exists before accessing its properties
+    if (!signer) {
+      toast.error('Wallet signer not available. Please reconnect your wallet.');
+      return;
+    }
+
+    // Check if we have a valid signer (either walletClient OR signTypedData function)
+    const hasSigner = !!walletClient || !!signTypedData;
+    if (!hasSigner || !signerAddress) {
+      toast.error('Wallet signer not available. Please reconnect your wallet.');
+      return;
+    }
+
+    // Check chain for external wallets and auto-switch if needed
+    if (walletType === 'external') {
+      const expectedChainId = isMainnet ? 8453 : 84532; // Base Mainnet : Base Sepolia
+
+      if (currentChainId !== expectedChainId) {
+        const networkName = isMainnet ? 'Base Mainnet' : 'Base Sepolia';
+        toast.error(
+          `Wrong network detected! Your wallet is on Chain ID ${currentChainId}. ` +
+          `Switching to ${networkName} (Chain ID ${expectedChainId})...`,
+          { duration: 5000 }
+        );
+
+        try {
+          await switchChain({ chainId: expectedChainId });
+          toast.success(`Successfully switched to ${networkName}!`);
+          // Wait a bit for the chain to fully switch
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        } catch (error: any) {
+          console.error('Chain switch failed:', error);
+          toast.error(
+            `Failed to switch to ${networkName}. Please manually switch your wallet to ${networkName} and try again.`,
+            { duration: 8000 }
+          );
+          return;
+        }
+      }
+    }
+
+    // Debug: Log wallet detection
+    console.log('🔍 Wallet Detection:', {
+      detectedType: walletType,
+      address,
+      hasWalletClient: !!walletClient,
+      connectorName: connector?.name,
+      currentChainId,
+    });
+
     setIsMinting(true);
+
+    // Show initial toast
+    const loadingToast = toast.loading('Initiating x402 payment flow...');
+
     try {
       console.log(`Starting x402 payment and NFT mint for ${quantity} NFT(s)...`);
+
+      // Step 1: Initial request
+      toast.loading('📡 Step 1: Requesting mint from server...', { id: loadingToast });
+
+      console.log('🔍 [MINT DEBUG] Starting mint request:', {
+        eoaAddress: signer.eoaAddress,
+        signerAddress: signerAddress,
+        smartAccountAddress: signer.address,
+        recipientWallet: signer.eoaAddress || signerAddress,
+        quantity: quantity
+      });
       
-      // Call the mint API with x402 payment handling
+      // ✅ NEW: Use the signer directly - it's already validated and has the correct type
+      const x402Signer: X402Signer = signer;
+
       const response = await makeX402Request(
         '/api/mint',
         {
@@ -132,40 +213,72 @@ export default function MintPage() {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            recipientWallet: address,
+            recipientWallet: signer.eoaAddress || signerAddress,  // ✅ Use EOA for recipient (matches payment sender)
             paymentMethod: 'email',
             quantity: quantity
           }),
         },
-        walletClient,
-        address
+        x402Signer, // Works for both CDP embedded AND external wallets!
+        {
+          onPaymentRequired: (amount) => {
+            toast.loading(`💳 Step 2: Payment required - ${amount} USDC`, { id: loadingToast });
+          },
+          onSigning: () => {
+            toast.loading('✍️ Step 3: Please sign the payment authorization...', { id: loadingToast });
+          },
+          onPaymentSigned: () => {
+            toast.loading('📤 Step 4: Submitting payment to server...', { id: loadingToast });
+          },
+          onMinting: () => {
+            toast.loading('🎨 Step 5: Minting your NFT(s) on-chain...', { id: loadingToast });
+          }
+        }
       );
 
       const data = await response.json();
 
+      console.log('📥 [MINT DEBUG] API Response:', {
+        status: response.status,
+        ok: response.ok,
+        data: data
+      });
+
       if (!response.ok) {
+        // Log the full error details for debugging
+        console.error('❌ Mint API Error Response:', {
+          status: response.status,
+          statusText: response.statusText,
+          errorData: data,
+          errorMessage: data.error?.message,
+          errorCode: data.error?.code,
+          errorDetails: data.error?.details
+        });
+
         throw new Error(data.error?.message || 'Minting failed');
       }
 
       console.log('✅ NFT(s) minted successfully:', data);
-      
+
+      // Success!
+      toast.success(`🎉 Successfully minted ${quantity} NFT${quantity > 1 ? 's' : ''}!`, { id: loadingToast, duration: 5000 });
+
       setMintResult({
         tokenIds: data.data.tokenIds || [data.data.tokenId],
         quantity: data.data.quantity || 1,
         transactionHash: data.data.transactionHash,
         contractAddress: data.data.contractAddress,
         explorerUrl: data.data.transactionUrl,
-        openseaUrl: data.data.openseaUrl,
+        openseaUrl: "https://opensea.io/collection/x402-protocol-pioneers/" + (data.data.tokenIds ? data.data.tokenIds[0] : data.data.tokenId),
       });
       setMintStep('success');
-      
-      // Refresh contract stats after successful mint
-      const updatedStats = await getContractStats();
-      setContractStats(updatedStats);
-      
-    } catch (error) {
-      console.error('❌ Minting failed:', error);
-      alert(error instanceof Error ? error.message : 'Minting failed. Please try again.');
+
+      // Refresh contract stats
+      const stats = await getContractStats();
+      setContractStats(stats);
+    } catch (error: any) {
+      console.error('❌ Mint failed:', error);
+      const errorMessage = error.message || 'Failed to mint NFT';
+      toast.error(errorMessage, { id: loadingToast, duration: 5000 });
     } finally {
       setIsMinting(false);
     }
@@ -177,7 +290,7 @@ export default function MintPage() {
       <main className="mx-auto flex w-full max-w-[clamp(1024px,calc(1024px+(100vw-1024px)*0.25),1248px)] justify-center px-4 md:px-6 lg:px-8">
         <div className="w-full">
           <nav aria-label="Breadcrumb" className="py-4 mb-8">
-            <Link 
+            <Link
               href="/"
               className="inline-flex items-center hover:text-base-blue transition-colors font-medium"
               style={{ color: 'var(--text-secondary)' }}
@@ -186,7 +299,7 @@ export default function MintPage() {
               Back to Home
             </Link>
           </nav>
-          
+
           <section className="max-w-2xl mx-auto text-center py-20">
             <div className="w-20 h-20 bg-base-blue/10 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse" aria-hidden="true">
               <Zap className="w-10 h-10 text-base-blue" />
@@ -207,7 +320,7 @@ export default function MintPage() {
       <main className="mx-auto flex w-full max-w-[clamp(1024px,calc(1024px+(100vw-1024px)*0.25),1248px)] justify-center px-4 md:px-6 lg:px-8">
         <div className="w-full">
           <nav aria-label="Breadcrumb" className="py-4 mb-8">
-            <Link 
+            <Link
               href="/"
               className="inline-flex items-center text-gray-700 hover:text-base-blue transition-colors font-medium"
             >
@@ -215,28 +328,28 @@ export default function MintPage() {
               Back to Home
             </Link>
           </nav>
-          
+
           <section aria-labelledby="sold-out-heading" className="max-w-2xl mx-auto text-center py-20">
             <div className="w-20 h-20 bg-negative/10 rounded-full flex items-center justify-center mx-auto mb-6" aria-hidden="true">
               <span className="text-4xl" role="img" aria-label="Fire emoji">🔥</span>
             </div>
             <h1 id="sold-out-heading" className="text-4xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>Collection Sold Out!</h1>
             <p className="text-lg mb-8" style={{ color: 'var(--text-secondary)' }}>
-              All 402 x402 Protocol Pioneer NFTs have been minted. 
+              All 402 x402 Protocol Pioneer NFTs have been minted.
               Check secondary markets to acquire one from existing holders.
             </p>
             <nav aria-label="Secondary market options" className="flex justify-center gap-4">
-              <a
+              <Link
                 href={`https://${isMainnet ? '' : 'testnets.'}opensea.io/collection/x402-protocol-pioneers`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-base-blue text-white px-6 py-3 rounded-lg font-medium hover:bg-base-blue/90"
-                aria-label="View x402collection on OpenSea (opens in new tab)"
+                aria-label="View collection on OpenSea (opens in new tab)"
               >
                 View on OpenSea
-              </a>
-              <Link 
-                href="/" 
+              </Link>
+              <Link
+                href="/"
                 className="px-6 py-3 rounded-lg font-medium btn-secondary"
               >
                 Back to Home
@@ -249,11 +362,11 @@ export default function MintPage() {
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-[clamp(1024px,calc(1024px+(100vw-1024px)*0.25),1248px)] justify-center px-4 md:px-6 lg:px-8">
+    <main className="mx-auto flex w-full max-w-[clamp(1024px,calc(1024px+(100vw-1024px)*0.25),1248px)] justify-center px-4 md:px-6 lg:px-8 mb-8">
       <div className="w-full">
         {/* Back Navigation */}
         <nav aria-label="Breadcrumb" className="py-4 mb-8">
-          <Link 
+          <Link
             href="/"
             className="inline-flex items-center hover:text-base-blue transition-colors font-medium"
             style={{ color: 'var(--text-secondary)' }}
@@ -271,7 +384,7 @@ export default function MintPage() {
               <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>{TOTAL_SUPPLY} total</span>
             </div>
             <div className="w-full rounded-full h-2" style={{ backgroundColor: 'var(--surface)' }} role="progressbar" aria-valuenow={(MINTED_COUNT / TOTAL_SUPPLY) * 100} aria-valuemin={0} aria-valuemax={100} aria-label={`${MINTED_COUNT} of ${TOTAL_SUPPLY} NFTs minted`}>
-              <div 
+              <div
                 className="bg-base-blue h-2 rounded-full transition-all duration-500"
                 style={{ width: `${(MINTED_COUNT / TOTAL_SUPPLY) * 100}%` }}
               ></div>
@@ -284,7 +397,7 @@ export default function MintPage() {
 
         {/* Main Content */}
         <div className="max-w-4xl mx-auto">
-          
+
           {/* Step 1: Wallet Connection */}
           {mintStep === 'wallet' && (
             <section aria-labelledby="wallet-heading">
@@ -293,11 +406,11 @@ export default function MintPage() {
                   <Mail className="w-4 h-4 mr-2" aria-hidden="true" />
                   Connect Wallet • {networkName}
                 </div>
-                
+
                 <h1 id="wallet-heading" className="text-4xl lg:text-5xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>
                   Mint x402 Protocol NFT
                 </h1>
-                
+
                 <p className="text-lg mb-8 max-w-2xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
                   Connect your wallet to mint NFT #{NEXT_TOKEN_ID} and join the exclusive group of x402 pioneers
                 </p>
@@ -346,11 +459,11 @@ export default function MintPage() {
                   <Zap className="w-4 h-4 mr-2" aria-hidden="true" />
                   x402 Payment • {networkName}
                 </div>
-                
+
                 <h1 id="mint-heading" className="text-4xl lg:text-5xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>
                   Mint NFT #{NEXT_TOKEN_ID}
                 </h1>
-                
+
                 <p className="text-lg mb-8 max-w-2xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
                   You're about to mint a {rarityTier.name} tier NFT using the x402 protocol on {networkName}
                 </p>
@@ -359,17 +472,17 @@ export default function MintPage() {
               {/* NFT Preview */}
               <div className="max-w-2xl mx-auto">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  
+
                   {/* NFT Artwork Preview */}
                   <div>
                     <article className="rounded-lg overflow-hidden bg-black aspect-square flex items-center justify-center" role="figure" aria-label={`Preview of x402 Protocol Pioneer NFT #${NEXT_TOKEN_ID}, ${rarityTier.name} tier`}>
-                      <img 
-                        src={rarityTier.animation} 
+                      <img
+                        src={rarityTier.animation}
                         alt={`${rarityTier.name} tier NFT animation`}
                         className="w-full h-full object-cover"
                       />
                     </article>
-                    
+
                     {/* NFT Info */}
                     <div className="mt-4 text-center">
                       <h2 className="text-xl font-bold mb-1" style={{ color: 'var(--text-primary)' }}>
@@ -380,7 +493,7 @@ export default function MintPage() {
                         {rarityTier.name}
                       </div>
                     </div>
-                    
+
                     {REMAINING <= 25 && (
                       <aside className="mt-4 bg-negative/10 border border-negative/20 rounded-lg p-3 text-center" role="alert">
                         <div className="flex items-center justify-center space-x-2 text-negative">
@@ -397,23 +510,42 @@ export default function MintPage() {
                     <article className="rounded-lg p-6 card">
                       <h3 className="font-bold text-lg mb-4" style={{ color: 'var(--text-primary)' }}>Select Quantity</h3>
                       <div className="grid grid-cols-5 gap-2 mb-4">
-                        {[1, 2, 3, 4, 5].map((num) => (
-                          <button
-                            key={num}
-                            onClick={() => setQuantity(num)}
-                            disabled={num > maxMintable}
-                            className={`py-3 px-4 rounded-lg font-medium transition-all ${
-                              quantity === num
-                                ? 'bg-base-blue text-white'
-                                : num > maxMintable
-                                ? 'bg-base-gray-100 text-base-gray-400 cursor-not-allowed'
-                                : 'bg-base-gray-100 text-base-black hover:bg-base-gray-200'
-                            }`}
-                            aria-label={`Mint ${num} NFT${num > 1 ? 's' : ''}`}
-                          >
-                            {num}
-                          </button>
-                        ))}
+                        {[1, 2, 3, 4, 5].map((num) => {
+                          // Determine if this square should be blue
+                          const isBlue = num <= quantity;
+                          // Determine what to display in this square
+                          let displayContent: string;
+                          
+                          if (quantity === 5 && isBlue) {
+                            // Special "BASED" display for quantity 5
+                            const letters = ['B', 'A', 'S', 'E', 'D'];
+                            displayContent = letters[num - 1];
+                          } else if (isBlue && num === quantity) {
+                            // For quantities 1-4, only the last blue square shows the number
+                            displayContent = num.toString();
+                          } else {
+                            // Other squares are empty
+                            displayContent = '';
+                          }
+
+                          return (
+                            <button
+                              key={num}
+                              onClick={() => setQuantity(num)}
+                              disabled={num > maxMintable}
+                              className={`py-3 px-4 rounded-lg font-medium transition-all ${
+                                isBlue
+                                  ? 'bg-base-blue text-white'
+                                  : num > maxMintable
+                                  ? 'bg-base-gray-100 text-base-gray-400 cursor-not-allowed'
+                                  : 'bg-base-gray-100 text-base-black hover:bg-base-gray-200'
+                              }`}
+                              aria-label={`Mint ${num} NFT${num > 1 ? 's' : ''}`}
+                            >
+                              {displayContent}
+                            </button>
+                          );
+                        })}
                       </div>
                       <div className="flex justify-between items-center text-sm">
                         <span style={{ color: 'var(--text-secondary)' }}>Total Price:</span>
@@ -457,21 +589,19 @@ export default function MintPage() {
 
                     <button
                       onClick={handleMint}
-                      disabled={isMinting}
+                      disabled={isMinting || isWalletClientLoading || isSwitchingChain}
                       className="w-full bg-base-blue text-white py-4 rounded-lg font-medium hover:bg-base-blue/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                       aria-label={isMinting ? `Minting ${quantity} NFT${quantity > 1 ? 's' : ''} in progress` : `Mint ${quantity} x402 Protocol NFT${quantity > 1 ? 's' : ''} for ${quantity} dollar${quantity > 1 ? 's' : ''} USDC`}
                     >
-                      {isMinting 
-                        ? `Minting ${quantity} NFT${quantity > 1 ? 's' : ''}...` 
-                        : `Mint ${quantity} NFT${quantity > 1 ? 's' : ''} (${quantity} USDC)`
+                      {isWalletClientLoading
+                        ? 'Initializing wallet...'
+                        : isSwitchingChain
+                          ? 'Switching network...'
+                          : isMinting
+                            ? `Minting ${quantity} NFT${quantity > 1 ? 's' : ''}...`
+                            : `Mint ${quantity} NFT${quantity > 1 ? 's' : ''} (${quantity} USDC)`
                       }
                     </button>
-
-                    <aside className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                      <p className="text-blue-800 text-sm text-center">
-                        💳 Payment will be processed via x402 protocol using your wallet's USDC
-                      </p>
-                    </aside>
                   </div>
                 </div>
               </div>
@@ -486,11 +616,11 @@ export default function MintPage() {
                   <CheckCircle2 className="w-4 h-4 mr-2" aria-hidden="true" />
                   Success • {networkName}
                 </div>
-                
+
                 <h1 id="success-heading" className="text-4xl lg:text-5xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>
                   NFT{mintResult.quantity > 1 ? 's' : ''} Minted!
                 </h1>
-                
+
                 <p className="text-lg mb-8 max-w-2xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
                   Congratulations! You've successfully minted {mintResult.quantity} x402 Protocol Pioneer NFT{mintResult.quantity > 1 ? 's' : ''}
                   {mintResult.tokenIds && ` #${mintResult.tokenIds[0]}${mintResult.quantity > 1 ? ` - #${mintResult.tokenIds[mintResult.tokenIds.length - 1]}` : ''}`}
@@ -502,8 +632,8 @@ export default function MintPage() {
                 <article className="bg-positive/5 border border-positive/20 rounded-lg p-8">
                   <div className="text-center mb-8">
                     <div className="w-24 h-24 rounded-full overflow-hidden flex items-center justify-center mx-auto mb-4 bg-black" aria-hidden="true">
-                      <img 
-                        src={rarityTier.animation} 
+                      <img
+                        src={rarityTier.animation}
                         alt={`${rarityTier.name} tier NFT animation`}
                         className="w-full h-full object-cover"
                       />

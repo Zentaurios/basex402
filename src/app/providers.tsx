@@ -2,6 +2,7 @@
 
 import { ReactNode, useState, useEffect } from 'react';
 import { useTheme } from 'next-themes';
+import { Toaster } from 'react-hot-toast';
 import { CDPReactProvider } from "@coinbase/cdp-react";
 import { type Config } from "@coinbase/cdp-react";
 import { OnchainKitProvider } from '@coinbase/onchainkit';
@@ -12,6 +13,7 @@ import { WalletProvider } from '@/components/wallet/WalletProvider';
 import { ExportModalProvider } from '@/components/wallet/ExportModalContext';
 import { GlobalWalletModal } from '@/components/wallet/GlobalWalletModal';
 import { InitializedWrapper } from '@/components/wallet/InitializedWrapper';
+import { OnchainKitWalletBridge } from '@/components/wallet/OnchainKitWalletBridge';
 import { LoadingBoundary } from '@/components/LoadingBoundary';
 import { getBaseOrgTheme } from '@/lib/cdp-theme';
 import { wagmiConfig } from '@/lib/wagmi-config';
@@ -20,22 +22,23 @@ import { base, baseSepolia } from 'viem/chains';
 // Check if mainnet based on environment
 const isMainnet = process.env.NEXT_PUBLIC_ENABLE_MAINNET === 'true';
 const chain = isMainnet ? base : baseSepolia;
+const networkId = isMainnet ? 'base' : 'base-sepolia';
 
 // CDP Configuration with BOTH EVM and Solana support
 // Config includes both AppConfig and CDPHooksConfig merged together
 const cdpConfig: Config = {
   // CDPHooksConfig properties
   projectId: process.env.NEXT_PUBLIC_CDP_PROJECT_ID ?? "",
-  // Enable EVM account creation on login
+  // Enable EVM account creation on login with network specification
   ethereum: {
-    createOnLogin: "smart" // or "eoa" for standard accounts
+    createOnLogin: "smart", // ✅ Create smart account (EOA owner used for x402 signing)
   },
   // Enable Solana account creation on login
   solana: {
     createOnLogin: true
   },
   // AppConfig properties (merged into Config)
-  appName: "x402NFT",
+  appName: "BaseX402",
   appLogoUrl: "/favicon.ico",
   authMethods: ["email"], // Only email authentication
 };
@@ -120,12 +123,53 @@ export function Providers({ children }: ProvidersProps) {
             <InitializedWrapper>
               <ExportModalProvider>
                 <WalletProvider>
+                  <OnchainKitWalletBridge />
                   <ThemeTransition />
                   
                   {/* Defer non-critical components to improve initial load */}
                   <LoadingBoundary delay={500}>
                     <GlobalWalletModal />
                   </LoadingBoundary>
+                  
+                  <Toaster
+                    position="top-right"
+                    toastOptions={{
+                      // Default options
+                      duration: 4000,
+                      style: {
+                        background: resolvedTheme === 'dark' ? 'var(--base-gray-80)' : 'var(--base-white)',
+                        color: resolvedTheme === 'dark' ? 'var(--base-white)' : 'var(--base-black)',
+                        border: `1px solid ${resolvedTheme === 'dark' ? 'var(--base-gray-60)' : 'var(--base-gray-15)'}`,
+                        borderRadius: '0.5rem',
+                        fontSize: '0.875rem',
+                        fontWeight: '500',
+                        boxShadow: resolvedTheme === 'dark' 
+                          ? '0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2)'
+                          : '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                      },
+                      // Success toast
+                      success: {
+                        iconTheme: {
+                          primary: 'var(--base-green)',
+                          secondary: resolvedTheme === 'dark' ? 'var(--base-gray-80)' : 'var(--base-white)',
+                        },
+                      },
+                      // Error toast
+                      error: {
+                        iconTheme: {
+                          primary: 'var(--base-red)',
+                          secondary: resolvedTheme === 'dark' ? 'var(--base-gray-80)' : 'var(--base-white)',
+                        },
+                      },
+                      // Loading toast
+                      loading: {
+                        iconTheme: {
+                          primary: resolvedTheme === 'dark' ? 'var(--base-cerulean)' : 'var(--base-blue)',
+                          secondary: resolvedTheme === 'dark' ? 'var(--base-gray-80)' : 'var(--base-white)',
+                        },
+                      },
+                    }}
+                  />
                   
                   <div className="min-h-screen font-sans transition-colors duration-300">
                     {children}

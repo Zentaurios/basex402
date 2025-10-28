@@ -83,7 +83,6 @@ export async function sendEvmTransaction(
       transactionHash,
     };
   } catch (error) {
-    console.error('Error sending EVM transaction:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to send transaction',

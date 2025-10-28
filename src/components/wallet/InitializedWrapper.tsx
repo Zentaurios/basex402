@@ -54,8 +54,8 @@ export function InitializedWrapper({ children }: InitializedWrapperProps) {
             disconnect();
           }
           
-          // Clear all CDP storage again
-          const cdpStorageKeys = [
+          // Clear all CDP and wagmi storage again
+          const storageKeys = [
             'cdp:session',
             'cdp:user',
             'cdp:wallet',
@@ -63,9 +63,14 @@ export function InitializedWrapper({ children }: InitializedWrapperProps) {
             'cdp-session',
             'cdp-user',
             'cdp-auth-token',
+            'wagmi.store',
+            'wagmi.cache',
+            'wagmi.connected',
+            'wagmi.wallet',
+            'wagmi.recentConnectorId',
           ];
           
-          cdpStorageKeys.forEach(key => {
+          storageKeys.forEach(key => {
             try {
               localStorage.removeItem(key);
               sessionStorage.removeItem(key);
@@ -73,6 +78,22 @@ export function InitializedWrapper({ children }: InitializedWrapperProps) {
               // Ignore
             }
           });
+          
+          // Clear any keys starting with 'cdp', 'wagmi', or '@w3m'
+          try {
+            Object.keys(localStorage).forEach(key => {
+              if (key.startsWith('cdp') || key.startsWith('wagmi') || key.startsWith('@w3m')) {
+                localStorage.removeItem(key);
+              }
+            });
+            Object.keys(sessionStorage).forEach(key => {
+              if (key.startsWith('cdp') || key.startsWith('wagmi') || key.startsWith('@w3m')) {
+                sessionStorage.removeItem(key);
+              }
+            });
+          } catch (e) {
+            // Ignore
+          }
         }
       } catch (e) {
         console.error('Error checking force signout:', e);

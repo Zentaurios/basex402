@@ -2,7 +2,50 @@ import { CdpClient } from '@coinbase/cdp-sdk';
 import type { ServerWalletConfig, DeploymentResult } from '@/types';
 import { getNetworkConfig, isMainnet, getCurrentNetworkName } from './network-config';
 import { createPublicClient, http, parseEther } from 'viem';
-import { baseSepolia, base } from 'viem/chains';
+import type { Chain } from 'viem/chains';
+
+/**
+ * Custom chain definitions using PUBLIC RPCs (not CDP's authenticated endpoints)
+ * This prevents viem from using CDP's RPC URLs that require authentication
+ */
+const baseMainnetChain: Chain = {
+  id: 8453,
+  name: 'Base',
+  nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+  rpcUrls: {
+    default: { http: ['https://mainnet.base.org'] },
+    public: { http: ['https://mainnet.base.org'] },
+  },
+  blockExplorers: {
+    default: { name: 'BaseScan', url: 'https://basescan.org' },
+  },
+  contracts: {
+    multicall3: {
+      address: '0xcA11bde05977b3631167028862bE2a173976CA11',
+      blockCreated: 5022,
+    },
+  },
+};
+
+const baseSepoliaChain: Chain = {
+  id: 84532,
+  name: 'Base Sepolia',
+  nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+  rpcUrls: {
+    default: { http: ['https://sepolia.base.org'] },
+    public: { http: ['https://sepolia.base.org'] },
+  },
+  blockExplorers: {
+    default: { name: 'BaseScan', url: 'https://sepolia.basescan.org' },
+  },
+  contracts: {
+    multicall3: {
+      address: '0xcA11bde05977b3631167028862bE2a173976CA11',
+      blockCreated: 1059647,
+    },
+  },
+  testnet: true,
+};
 
 /**
  * CDP Server Wallets v2 - Unified Implementation
@@ -24,7 +67,7 @@ export function initializeCDP(): CdpClient {
     apiKeyId: process.env.CDP_API_KEY_ID!,
     apiKeySecret: process.env.CDP_API_KEY_SECRET!,
     walletSecret: process.env.CDP_WALLET_SECRET!,
-    network: (process.env.NEXT_PUBLIC_ENABLE_MAINNET === 'true' ? 'base-mainnet' : 'base-sepolia') as 'base-sepolia' | 'base-mainnet'
+    network: (process.env.NEXT_PUBLIC_ENABLE_MAINNET === 'true' ? 'base' : 'base-sepolia') as 'base-sepolia' | 'base'
   };
 
   // Validate required environment variables
@@ -59,29 +102,38 @@ export function getCDPClient(): CdpClient {
 
 /**
  * Get viem public client for the current network
+ * IMPORTANT: Uses the public RPC URL from network config, not the chain's default authenticated endpoint
  */
 export function getPublicClient() {
-  const chain = isMainnet() ? base : baseSepolia;
+  const chain = isMainnet() ? baseMainnetChain : baseSepoliaChain;
+  const networkConfig = getNetworkConfig();
+  
+  console.log(`🌐 Creating public client with RPC: ${networkConfig.rpcUrl}`);
+  
   return createPublicClient({ 
     chain, 
-    transport: http() 
+    transport: http(networkConfig.rpcUrl)  // ✅ Use configured public RPC
   });
 }
 
 /**
  * Get or create the deployer account for contract deployment
+ * Uses CDP_DEPLOYER_WALLET_NAME env var if set, otherwise defaults to 'x402-contract-deployer'
  */
 export async function getDeployerAccount() {
   try {
     const cdp = initializeCDP();
     const networkName = getCurrentNetworkName();
     
+    // Allow overriding the wallet name via environment variable
+    const walletName = process.env.CDP_DEPLOYER_WALLET_NAME || 'x402-contract-deployer';
+    
     // Use a named account for consistent deployment address
     const account = await cdp.evm.getOrCreateAccount({ 
-      name: 'x402-contract-deployer' 
+      name: walletName
     });
     
-    console.log(`📱 Deployer account: ${account.address} on ${networkName}`);
+    console.log(`📱 Deployer account (${walletName}): ${account.address} on ${networkName}`);
     return account;
   } catch (error) {
     console.error('❌ Failed to get deployer account:', error);
@@ -91,15 +143,20 @@ export async function getDeployerAccount() {
 
 /**
  * Get or create the minting wallet account
+ * Uses CDP_MINTING_WALLET_NAME env var if set, otherwise defaults to 'x402-minting-wallet'
  */
 export async function getMintingAccount() {
   try {
     const cdp = initializeCDP();
+    
+    // Allow overriding the wallet name via environment variable
+    const walletName = process.env.CDP_MINTING_WALLET_NAME || 'x402-minting-wallet';
+    
     const account = await cdp.evm.getOrCreateAccount({ 
-      name: 'x402-minting-wallet' 
+      name: walletName
     });
     
-    console.log(`📱 Minting account: ${account.address}`);
+    console.log(`📱 Minting account (${walletName}): ${account.address}`);
     return account;
   } catch (error) {
     console.error('❌ Failed to get minting account:', error);
@@ -176,7 +233,7 @@ export async function deployContract(
   try {
     const cdp = initializeCDP();
     const networkName = getCurrentNetworkName();
-    const network = isMainnet() ? 'base-mainnet' : 'base-sepolia';
+    const network = isMainnet() ? 'base' : 'base-sepolia';
     const networkConfig = getNetworkConfig();
     
     console.log(`🚀 Deploying contract to ${networkName} using CDP Server Wallets v2`);
@@ -282,7 +339,7 @@ export async function sendContractTransaction(
   try {
     const cdp = initializeCDP();
     const networkName = getCurrentNetworkName();
-    const network = isMainnet() ? 'base-mainnet' : 'base-sepolia';
+    const network = isMainnet() ? 'base' : 'base-sepolia';
     const networkConfig = getNetworkConfig();
     
     console.log(`📞 Sending transaction to ${contractAddress} on ${networkName}`);

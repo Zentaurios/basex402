@@ -3,9 +3,9 @@
  * 
  * Use this script to transfer ownership of the NFT contract
  * to your personal wallet after deployment
- */
 
-import { transferOwnership } from '../contracts/deploy';
+
+import { transferOwnership } from './deploy-mainnet';
 
 const CONTRACT_ADDRESS = process.env.NFT_CONTRACT_ADDRESS;
 const NEW_OWNER = '0xe5b0AE2782a61169218Da729EE40caa25eF47885'; // Your personal wallet
@@ -41,3 +41,5 @@ main()
     console.error(error);
     process.exit(1);
   });
+
+   */

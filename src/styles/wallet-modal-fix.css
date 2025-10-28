@@ -60,3 +60,30 @@ div[style*="position: absolute"][class*="ock"] {
 .z-40[data-portal-origin] {
   z-index: 10000 !important;
 }
+
+/**
+ * Fix OnchainKit ConnectWallet button duplicate rendering
+ * Due to Tailwind v4 vs v3 compatibility issue
+ */
+
+/* Hide screen-reader only elements that are showing due to Tailwind v3/v4 conflict */
+.ock\:sr-only,
+[class*="ock:sr-only"] {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border-width: 0 !important;
+}
+
+/* Ensure button is visible and styled correctly */
+button.ock-wallet-button,
+button[class*="ock:cursor-pointer"] {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}

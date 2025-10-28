@@ -64,7 +64,7 @@ export function useTokenBalances(
                 token: {
                   symbol: 'ETH',
                   name: 'Ethereum',
-                  network: 'base-mainnet',
+                  network: 'base',
                 },
               };
               

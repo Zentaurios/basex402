@@ -10,15 +10,14 @@ import {
   useExportEvmAccount,
   useExportSolanaAccount
 } from '@coinbase/cdp-hooks';
-import { useDisconnect } from 'wagmi';
+import { useDisconnect, useBalance } from 'wagmi';
+import { base, baseSepolia } from 'wagmi/chains';
 import { useWallet as useWalletContext } from '@/components/wallet/WalletProvider';
 import { 
   Wallet, 
   Copy, 
   LogOut, 
-  Send, 
   Key, 
-  Image as ImageIcon,
   ChevronDown,
   Check,
   AlertTriangle,
@@ -30,9 +29,11 @@ import {
 } from 'lucide-react';
 import { getTokenBalances } from '@/app/actions/token-balances';
 import { getSolanaTokenBalances } from '@/app/actions/solana-token-balances';
+import { getEthBalance } from '@/app/actions/eth-balance';
 import { formatTokenAmount } from '@/lib/utils/token';
 import { SendTab } from './SendTab';
 import { filterTokens, sortTokens, type FilteredToken } from '@/lib/tokens';
+import { NFTsDisplay, useNFTBalances } from './shared';
 
 type Chain = 'ethereum' | 'solana';
 type ExportStep = 'warning' | 'exporting' | 'success';
@@ -64,7 +65,18 @@ export function WalletDropdown({ isMobileMenu = false }: WalletDropdownProps) {
   const { exportEvmAccount } = useExportEvmAccount();
   const { exportSolanaAccount } = useExportSolanaAccount();
   const { disconnect } = useDisconnect();
-  const { address: walletAddress, walletType: connectedWalletType } = useWalletContext();
+  const { address: walletAddress, eoaAddress, smartAccountAddress, walletType: connectedWalletType } = useWalletContext();
+  
+  // 🔍 Debug wallet type on mount
+  useEffect(() => {
+    console.log('🔍 WalletDropdown: Wallet Type:', {
+      connectedWalletType,
+      evmAddress,
+      eoaAddress,
+      smartAccountAddress,
+      walletAddress,
+    });
+  }, [connectedWalletType, evmAddress, eoaAddress, smartAccountAddress, walletAddress]);
   
   const [isOpen, setIsOpen] = useState(false);
   const [activeChain, setActiveChain] = useState<Chain>('ethereum');
@@ -77,6 +89,18 @@ export function WalletDropdown({ isMobileMenu = false }: WalletDropdownProps) {
   const [keyCopied, setKeyCopied] = useState(false);
   const [balances, setBalances] = useState<TokenBalance[] | null>(null);
   const [loadingBalances, setLoadingBalances] = useState(false);
+  
+  // Determine current address based on active chain and wallet type
+  // For embedded wallets on Ethereum, use EOA address (not smart account)
+  const currentAddress = activeChain === 'ethereum' 
+    ? (connectedWalletType === 'embedded' ? (eoaAddress || evmAddress) : evmAddress)
+    : solanaAddress;
+  
+  // Fetch NFTs when NFT tab is active
+  const { nfts, loading: loadingNFTs } = useNFTBalances(
+    currentAddress,
+    activeTab === 'nfts'
+  );
   const [holdProgress, setHoldProgress] = useState(0);
   const [isHolding, setIsHolding] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
@@ -117,7 +141,7 @@ export function WalletDropdown({ isMobileMenu = false }: WalletDropdownProps) {
 
   // Hold-down button progress
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setInterval>;
     
     if (isHolding && holdProgress < 100) {
       interval = setInterval(() => {
@@ -142,7 +166,32 @@ export function WalletDropdown({ isMobileMenu = false }: WalletDropdownProps) {
     };
   }, [isHolding, holdProgress]);
 
-  // Fetch token balances (only if API credentials are configured)
+  // 🔥 For external wallets, use wagmi's useBalance hook (client-side, simpler)
+  // For embedded wallets, we'll fetch via server actions (required for CDP)
+  const isMainnet = process.env.NEXT_PUBLIC_ENABLE_MAINNET === 'true';
+  const chainId = isMainnet ? base.id : baseSepolia.id;
+  
+  const { data: wagmiBalance, isLoading: wagmiBalanceLoading, error: wagmiBalanceError } = useBalance({
+    address: (connectedWalletType === 'external' && activeChain === 'ethereum' && evmAddress) 
+      ? evmAddress as `0x${string}` 
+      : undefined,
+    chainId: chainId,
+  });
+  
+  // Debug wagmi balance
+  useEffect(() => {
+    if (connectedWalletType === 'external' && activeChain === 'ethereum') {
+      console.log('📊 Wagmi Balance Debug:', {
+        address: evmAddress,
+        chainId,
+        balance: wagmiBalance,
+        loading: wagmiBalanceLoading,
+        error: wagmiBalanceError,
+      });
+    }
+  }, [wagmiBalance, wagmiBalanceLoading, wagmiBalanceError, connectedWalletType, activeChain, evmAddress, chainId]);
+
+  // Fetch token balances (for embedded wallets or when needed)
   useEffect(() => {
     async function fetchBalances() {
       if (!activeTab || (activeTab !== 'assets' && activeTab !== 'send')) return;
@@ -151,8 +200,99 @@ export function WalletDropdown({ isMobileMenu = false }: WalletDropdownProps) {
       try {
         let tokenBalances: TokenBalance[] = [];
         
-        if (activeChain === 'ethereum' && evmAddress) {
-          tokenBalances = await getTokenBalances(evmAddress);
+        if (activeChain === 'ethereum') {
+          // 🔥 For external wallets, use wagmi balance (client-side)
+          if (connectedWalletType === 'external' && wagmiBalance) {
+            console.log('🔍 Using wagmi balance for external wallet:', evmAddress);
+            
+            // Create ETH balance from wagmi
+            const isMainnet = process.env.NEXT_PUBLIC_ENABLE_MAINNET === 'true';
+            const network = isMainnet ? 'base' : 'base-sepolia';
+            
+            tokenBalances = [{
+              amount: {
+                amount: wagmiBalance.value.toString(),
+                decimals: wagmiBalance.decimals,
+              },
+              token: {
+                network: network,
+                symbol: wagmiBalance.symbol,
+                name: 'Ethereum',
+                contractAddress: '0x0000000000000000000000000000000000000000',
+              },
+            }];
+            
+            // TODO: Could fetch ERC-20 balances here too via CDP or other API
+            // For now, just showing ETH for external wallets
+          }
+          // ✅ For embedded wallets, use server actions with EOA address
+          else if (connectedWalletType === 'embedded') {
+            const addressToQuery = eoaAddress || evmAddress;
+            
+            if (addressToQuery) {
+              console.log('🔍 Fetching token balances for embedded wallet:', { 
+                address: addressToQuery,
+                isEOA: addressToQuery === eoaAddress
+              });
+              
+              // Fetch ERC-20 token balances (this already includes ETH from the queried address)
+              tokenBalances = await getTokenBalances(addressToQuery);
+              
+              // 🔥 For embedded wallets, ALSO check Smart Account for native ETH
+              // (ETH might still be on the Smart Account from before switching to EOA mode)
+              if (smartAccountAddress && smartAccountAddress !== eoaAddress) {
+                console.log('🔍 Also checking Smart Account for ETH:', smartAccountAddress);
+                const smartAccountEth = await getEthBalance(smartAccountAddress);
+                
+                if (smartAccountEth && smartAccountEth !== '0') {
+                  console.log('💰 Found ETH on Smart Account:', smartAccountEth);
+                  
+                  // Find existing ETH balance in tokenBalances
+                  const ethIndex = tokenBalances.findIndex(b => 
+                    b.token.contractAddress === '0x0000000000000000000000000000000000000000'
+                  );
+                  
+                  if (ethIndex >= 0) {
+                    // Combine EOA and Smart Account ETH balances
+                    const eoaEth = BigInt(tokenBalances[ethIndex].amount.amount);
+                    const smartEth = BigInt(smartAccountEth);
+                    const totalEth = eoaEth + smartEth;
+                    
+                    tokenBalances[ethIndex] = {
+                      ...tokenBalances[ethIndex],
+                      amount: {
+                        amount: totalEth.toString(),
+                        decimals: 18,
+                      },
+                    };
+                    
+                    console.log('💰 Combined ETH balance:', {
+                      eoaEth: eoaEth.toString(),
+                      smartEth: smartEth.toString(),
+                      total: totalEth.toString(),
+                    });
+                  } else {
+                    // No ETH on EOA, add Smart Account ETH
+                    const isMainnet = process.env.NEXT_PUBLIC_ENABLE_MAINNET === 'true';
+                    const network = isMainnet ? 'base' : 'base-sepolia';
+                    
+                    tokenBalances.unshift({
+                      amount: {
+                        amount: smartAccountEth,
+                        decimals: 18,
+                      },
+                      token: {
+                        network: network,
+                        symbol: 'ETH',
+                        name: 'Ethereum',
+                        contractAddress: '0x0000000000000000000000000000000000000000',
+                      },
+                    });
+                  }
+                }
+              }
+            }
+          }
         } else if (activeChain === 'solana' && solanaAddress) {
           tokenBalances = await getSolanaTokenBalances(solanaAddress);
         }
@@ -168,7 +308,7 @@ export function WalletDropdown({ isMobileMenu = false }: WalletDropdownProps) {
     }
 
     fetchBalances();
-  }, [activeChain, evmAddress, solanaAddress, activeTab]);
+  }, [activeChain, evmAddress, solanaAddress, activeTab, connectedWalletType, eoaAddress, smartAccountAddress, wagmiBalance]);
 
   const handleCopyAddress = async () => {
     const address = activeChain === 'ethereum' ? evmAddress : solanaAddress;
@@ -243,71 +383,26 @@ export function WalletDropdown({ isMobileMenu = false }: WalletDropdownProps) {
 
   const handleSignOut = async () => {
     try {
-      // Set a flag BEFORE signing out to prevent auto-restore
-      try {
-        localStorage.setItem('cdp-force-signout', 'true');
-        sessionStorage.setItem('cdp-force-signout', 'true');
-      } catch (e) {
-        // Ignore
-      }
-      
+      console.log('🔌 WalletDropdown: Starting sign out for EMBEDDED wallet...');
       setIsOpen(false);
       
-      // Disconnect external wallet if connected
-      if (connectedWalletType === 'external') {
-        console.log('Disconnecting external wallet');
-        disconnect();
-      }
+      // 2. Disconnect wagmi (in case it's somehow connected)
+      disconnect();
+      console.log('🔌 Wagmi disconnected');
       
-      // Sign out of CDP embedded wallet if signed in
+      // 3. Sign out of CDP embedded wallet
       if (isSignedIn) {
-        console.log('Signing out of CDP wallet');
+        console.log('🔌 Signing out of CDP wallet');
         await signOut();
       }
       
-      // Clear all storage
-      const storageKeys = [
-        'cdp:session',
-        'cdp:user',
-        'cdp:wallet',
-        'cdp:auth',
-        'cdp-session',
-        'cdp-user',
-        'cdp-auth-token',
-        'wagmi.store',
-        'wagmi.cache',
-        'wagmi.connected',
-      ];
-      
-      storageKeys.forEach(key => {
-        try {
-          localStorage.removeItem(key);
-          sessionStorage.removeItem(key);
-        } catch (e) {
-          // Ignore
-        }
-      });
-      
-      // Clear any keys starting with 'cdp' or 'wagmi'
-      try {
-        Object.keys(localStorage).forEach(key => {
-          if (key.startsWith('cdp') || key.startsWith('wagmi')) {
-            localStorage.removeItem(key);
-          }
-        });
-        Object.keys(sessionStorage).forEach(key => {
-          if (key.startsWith('cdp') || key.startsWith('wagmi')) {
-            sessionStorage.removeItem(key);
-          }
-        });
-      } catch (e) {
-        // Ignore
-      }
-      
-      // Force a page reload
-      window.location.href = '/?t=' + Date.now();
+      // 4. Force a page reload to ensure clean state
+      setTimeout(() => {
+        window.location.href = '/?t=' + Date.now();
+      }, 300);
     } catch (error) {
       console.error('Sign out failed:', error);
+      // Still reload even on error
       window.location.href = '/?t=' + Date.now();
     }
   };
@@ -317,14 +412,15 @@ export function WalletDropdown({ isMobileMenu = false }: WalletDropdownProps) {
     return null;
   }
 
-  // Use CDP address for embedded wallet, or walletAddress for external wallet
-  const displayAddress = evmAddress || walletAddress;
+  // ✅ For embedded wallets, show EOA address (used for x402 signing)
+  // For external wallets, show the wallet address
+  const displayAddress = connectedWalletType === 'embedded' 
+    ? (eoaAddress || evmAddress || walletAddress)  // Prefer EOA for embedded
+    : (evmAddress || walletAddress);                // Use regular address for external
 
   const formatAddress = (address: string) => {
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
-  };
-
-  const currentAddress = activeChain === 'ethereum' ? evmAddress : solanaAddress;
+  }
 
   return (
     <div className="relative" ref={dropdownRef}>
@@ -665,34 +761,76 @@ export function WalletDropdown({ isMobileMenu = false }: WalletDropdownProps) {
               </div>
 
               <div className="p-4 border-b" style={{ borderColor: 'var(--card-border)' }}>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
-                    {activeChain === 'ethereum' ? 'Ethereum' : 'Solana'} Address
-                  </span>
-                  <button
-                    onClick={handleCopyAddress}
-                    className="flex items-center space-x-1 text-xs px-2 py-1 rounded transition-colors"
-                    style={{ 
-                      color: copied ? 'var(--text-primary)' : 'var(--text-secondary)',
-                      backgroundColor: copied ? 'var(--surface)' : 'transparent'
-                    }}
-                  >
-                    {copied ? (
-                      <>
-                        <Check className="w-3 h-3" />
-                        <span>Copied!</span>
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="w-3 h-3" />
-                        <span>Copy</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-                <div className="font-mono text-sm break-all" style={{ color: 'var(--text-primary)' }}>
-                  {currentAddress || 'No address available'}
-                </div>
+                {/* For CDP embedded wallets, show EOA address (smart account works in background) */}
+                {activeChain === 'ethereum' && connectedWalletType === 'embedded' ? (
+                  <>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
+                        Ethereum Address
+                      </span>
+                      <button
+                        onClick={async () => {
+                          if (!eoaAddress) return;
+                          await navigator.clipboard.writeText(eoaAddress);
+                          setCopied(true);
+                          setTimeout(() => setCopied(false), 2000);
+                        }}
+                        className="flex items-center space-x-1 text-xs px-2 py-1 rounded transition-colors"
+                        style={{ 
+                          color: copied ? 'var(--text-primary)' : 'var(--text-secondary)',
+                          backgroundColor: copied ? 'var(--surface)' : 'transparent'
+                        }}
+                      >
+                        {copied ? (
+                          <>
+                            <Check className="w-3 h-3" />
+                            <span>Copied!</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3 h-3" />
+                            <span>Copy</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                    <div className="font-mono text-sm break-all" style={{ color: 'var(--text-primary)' }}>
+                      {eoaAddress || 'Address not available'}
+                    </div>
+                  </>
+                ) : (
+                  /* For external wallets or Solana, show regular address */
+                  <>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
+                        {activeChain === 'ethereum' ? 'Ethereum' : 'Solana'} Address
+                      </span>
+                      <button
+                        onClick={handleCopyAddress}
+                        className="flex items-center space-x-1 text-xs px-2 py-1 rounded transition-colors"
+                        style={{ 
+                          color: copied ? 'var(--text-primary)' : 'var(--text-secondary)',
+                          backgroundColor: copied ? 'var(--surface)' : 'transparent'
+                        }}
+                      >
+                        {copied ? (
+                          <>
+                            <Check className="w-3 h-3" />
+                            <span>Copied!</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3 h-3" />
+                            <span>Copy</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                    <div className="font-mono text-sm break-all" style={{ color: 'var(--text-primary)' }}>
+                      {currentAddress || 'No address available'}
+                    </div>
+                  </>
+                )}
               </div>
 
               <div className="flex border-b" style={{ borderColor: 'var(--card-border)' }}>
@@ -819,9 +957,10 @@ export function WalletDropdown({ isMobileMenu = false }: WalletDropdownProps) {
                         )
                     )}
                 {activeTab === 'nfts' && (
-                  <div className="text-center py-8 text-xs" style={{ color: 'var(--text-secondary)' }}>
-                    NFTs coming soon
-                  </div>
+                  <NFTsDisplay
+                    nfts={nfts}
+                    loading={loadingNFTs}
+                  />
                 )}
                 {activeTab === 'send' && (
                   <SendTab
@@ -865,21 +1004,5 @@ function SolanaLogo({ active }: { active: boolean }) {
       <path d="M4.08 17.37a.7.7 0 01.5-.2h16.42a.35.35 0 01.25.6l-2.92 2.92a.7.7 0 01-.5.2H1.41a.35.35 0 01-.25-.6l2.92-2.92zm0-14.74a.7.7 0 01.5-.2h16.42a.35.35 0 01.25.6L18.33 5.95a.7.7 0 01-.5.2H1.41a.35.35 0 01-.25-.6l2.92-2.92zM18.33 11.31a.7.7 0 00-.5-.2H1.41a.35.35 0 00-.25.6l2.92 2.92a.7.7 0 00.5.2h16.42a.35.35 0 00.25-.6l-2.92-2.92z" 
         fill={active ? '#14F195' : '#8A92A6'} />
     </svg>
-  );
-}
-
-function SolanaPlaceholder() {
-  return (
-    <div className="text-center py-8">
-      <div className="mb-4 flex justify-center">
-        <SolanaLogo active={true} />
-      </div>
-      <p className="text-sm mb-2" style={{ color: 'var(--text-primary)' }}>
-        You have a Solana wallet.
-      </p>
-      <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-        Functionality coming soon.
-      </p>
-    </div>
   );
 }
