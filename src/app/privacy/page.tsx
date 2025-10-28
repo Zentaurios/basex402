@@ -416,9 +416,7 @@ export default function PrivacyPage() {
                 For questions about this Privacy Policy or to exercise your privacy rights, contact us at:
               </p>
               <ul className="list-none mb-4" style={{ color: 'var(--text-secondary)' }}>
-                <li><strong>Privacy Inquiries:</strong> privacy@basex402.com</li>
-                <li><strong>Data Deletion Requests:</strong> privacy@basex402.com</li>
-                <li><strong>DMCA Takedowns:</strong> legal@basex402.com</li>
+                <li>Contact information coming soon</li>
                 <li><strong>Website:</strong> <Link href="/" className="text-base-blue hover:underline">basex402.com</Link></li>
               </ul>
               <p className="mb-4" style={{ color: 'var(--text-secondary)' }}>

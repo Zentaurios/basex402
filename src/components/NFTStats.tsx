@@ -1,7 +1,11 @@
 'use client';
 
 import { useReadContract } from 'wagmi';
-import { base } from 'wagmi/chains';
+import { base, baseSepolia } from 'wagmi/chains';
+
+// Check if mainnet based on environment
+const isMainnet = process.env.NEXT_PUBLIC_ENABLE_MAINNET === 'true';
+const chain = isMainnet ? base : baseSepolia;
 
 const NFT_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_NFT_CONTRACT as `0x${string}`;
 const TOTAL_SUPPLY = 402;
@@ -21,7 +25,7 @@ export function useNFTStats() {
     address: NFT_CONTRACT_ADDRESS,
     abi: NFT_ABI,
     functionName: 'totalSupply',
-    chainId: base.id,
+    chainId: chain.id, // ✅ Use correct chain based on environment
     query: {
       refetchInterval: 30_000,
       staleTime: 10_000,

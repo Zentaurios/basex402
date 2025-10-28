@@ -18,6 +18,11 @@ export const dynamic = 'force-dynamic';
 const isMainnet = process.env.NEXT_PUBLIC_ENABLE_MAINNET === 'true';
 const networkName = isMainnet ? 'Base' : 'Base Sepolia';
 
+// Public mint constants
+const TOTAL_SUPPLY = 402;
+const MAX_PUBLIC_SUPPLY = 355; // Last 47 NFTs (356-402) reserved for airdrop
+const AIRDROP_RESERVE = 47;
+
 // Determine rarity tier for next mint
 function getRarityTier(tokenId: number) {
   if (tokenId <= 10) return {
@@ -76,12 +81,21 @@ export default function MintPage() {
   } | null>(null);
   const [isLoadingStats, setIsLoadingStats] = useState(true);
 
-  // Calculate max mintable based on remaining supply
-  const maxMintable = Math.min(5, contractStats?.remaining || 0);
-  const TOTAL_SUPPLY = contractStats?.maxSupply || 402;
+  // Calculate public mint availability (excluding airdrop reserve)
   const MINTED_COUNT = contractStats?.totalSupply || 0;
-  const REMAINING = contractStats?.remaining || 0;
   const NEXT_TOKEN_ID = contractStats?.nextTokenId || 1;
+  
+  // How many NFTs are left for public minting (before airdrop reserve)
+  const publicRemaining = Math.max(0, MAX_PUBLIC_SUPPLY - MINTED_COUNT);
+  
+  // Check if we're at or past the public mint cutoff
+  const isPublicMintClosed = MINTED_COUNT >= MAX_PUBLIC_SUPPLY;
+  
+  // Calculate max mintable: min of (5 NFTs per tx, public remaining, what user can afford)
+  const maxMintable = Math.min(5, publicRemaining);
+  
+  // Special flag: is this the last available public mint?
+  const isLastPublicMint = publicRemaining > 0 && publicRemaining <= 5;
 
   const rarityTier = getRarityTier(NEXT_TOKEN_ID);
 
@@ -124,6 +138,18 @@ export default function MintPage() {
   const handleMint = async () => {
     if (!address) {
       toast.error('Please connect your wallet first');
+      return;
+    }
+
+    // Validate quantity doesn't exceed public remaining
+    if (quantity > publicRemaining) {
+      toast.error(`Only ${publicRemaining} NFT${publicRemaining !== 1 ? 's' : ''} remaining before airdrop reserve. Please reduce quantity.`);
+      return;
+    }
+
+    // Check if public minting is closed
+    if (publicRemaining === 0) {
+      toast.error('Public minting is closed. The last 47 NFTs are reserved for airdrop.');
       return;
     }
 
@@ -314,8 +340,8 @@ export default function MintPage() {
     );
   }
 
-  // Check if collection is sold out
-  if (REMAINING <= 0) {
+  // Check if public minting is closed (last 47 reserved for airdrop)
+  if (isPublicMintClosed) {
     return (
       <main className="mx-auto flex w-full max-w-[clamp(1024px,calc(1024px+(100vw-1024px)*0.25),1248px)] justify-center px-4 md:px-6 lg:px-8">
         <div className="w-full">
@@ -335,7 +361,7 @@ export default function MintPage() {
             </div>
             <h1 id="sold-out-heading" className="text-4xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>Collection Sold Out!</h1>
             <p className="text-lg mb-8" style={{ color: 'var(--text-secondary)' }}>
-              All 402 x402 Protocol Pioneer NFTs have been minted.
+              Public minting is complete! The last 47 NFTs are reserved for an airdrop to early supporters.
               Check secondary markets to acquire one from existing holders.
             </p>
             <nav aria-label="Secondary market options" className="flex justify-center gap-4">
@@ -390,7 +416,10 @@ export default function MintPage() {
               ></div>
             </div>
             <div className="text-center mt-2">
-              <span className="text-lg font-bold text-base-blue">{REMAINING} remaining</span>
+              <span className="text-lg font-bold text-base-blue">{publicRemaining} remaining</span>
+              {isLastPublicMint && publicRemaining > 0 && (
+                <p className="text-sm mt-1 text-warning">⚡ Last {publicRemaining} before airdrop reserve!</p>
+              )}
             </div>
           </div>
         </section>
@@ -494,11 +523,23 @@ export default function MintPage() {
                       </div>
                     </div>
 
-                    {REMAINING <= 25 && (
+                    {/* Warning messages */}
+                    {isLastPublicMint && publicRemaining > 0 && (
+                      <aside className="mt-4 bg-warning/10 border border-warning/20 rounded-lg p-3" role="alert">
+                        <div className="text-warning text-sm font-medium text-center">
+                          <Timer className="w-4 h-4 inline mr-2" aria-hidden="true" />
+                          {publicRemaining === 1 
+                            ? "🎉 Last public mint! Triggers airdrop of 47 NFTs to early supporters."
+                            : `⚡ Only ${publicRemaining} left before airdrop reserve!`
+                          }
+                        </div>
+                      </aside>
+                    )}
+                    {publicRemaining <= 25 && publicRemaining > 5 && (
                       <aside className="mt-4 bg-negative/10 border border-negative/20 rounded-lg p-3 text-center" role="alert">
                         <div className="flex items-center justify-center space-x-2 text-negative">
                           <Timer className="w-4 h-4" aria-hidden="true" />
-                          <span className="text-sm font-medium">Only {REMAINING} left!</span>
+                          <span className="text-sm font-medium">Only {publicRemaining} left!</span>
                         </div>
                       </aside>
                     )}
@@ -589,17 +630,21 @@ export default function MintPage() {
 
                     <button
                       onClick={handleMint}
-                      disabled={isMinting || isWalletClientLoading || isSwitchingChain}
+                      disabled={isMinting || isWalletClientLoading || isSwitchingChain || publicRemaining === 0}
                       className="w-full bg-base-blue text-white py-4 rounded-lg font-medium hover:bg-base-blue/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                       aria-label={isMinting ? `Minting ${quantity} NFT${quantity > 1 ? 's' : ''} in progress` : `Mint ${quantity} x402 Protocol NFT${quantity > 1 ? 's' : ''} for ${quantity} dollar${quantity > 1 ? 's' : ''} USDC`}
                     >
-                      {isWalletClientLoading
-                        ? 'Initializing wallet...'
-                        : isSwitchingChain
-                          ? 'Switching network...'
-                          : isMinting
-                            ? `Minting ${quantity} NFT${quantity > 1 ? 's' : ''}...`
-                            : `Mint ${quantity} NFT${quantity > 1 ? 's' : ''} (${quantity} USDC)`
+                      {publicRemaining === 0
+                        ? 'Public Minting Closed'
+                        : isWalletClientLoading
+                          ? 'Initializing wallet...'
+                          : isSwitchingChain
+                            ? 'Switching network...'
+                            : isMinting
+                              ? `Minting ${quantity} NFT${quantity > 1 ? 's' : ''}...`
+                              : publicRemaining === 1 && quantity === 1
+                                ? `Mint Last NFT & Trigger Airdrop (${quantity} USDC)`
+                                : `Mint ${quantity} NFT${quantity > 1 ? 's' : ''} (${quantity} USDC)`
                       }
                     </button>
                   </div>
@@ -625,6 +670,19 @@ export default function MintPage() {
                   Congratulations! You've successfully minted {mintResult.quantity} x402 Protocol Pioneer NFT{mintResult.quantity > 1 ? 's' : ''}
                   {mintResult.tokenIds && ` #${mintResult.tokenIds[0]}${mintResult.quantity > 1 ? ` - #${mintResult.tokenIds[mintResult.tokenIds.length - 1]}` : ''}`}
                 </p>
+
+                {/* Special message if they minted the last public NFT */}
+                {publicRemaining === 0 && (
+                  <div className="mb-6 p-4 bg-warning/10 border-2 border-warning/30 rounded-lg text-center">
+                    <div className="text-2xl mb-2">🎉🎊</div>
+                    <p className="font-bold text-lg text-warning mb-1">
+                      You minted the last public NFT!
+                    </p>
+                    <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                      The airdrop of 47 NFTs to early supporters has been triggered.
+                    </p>
+                  </div>
+                )}
               </header>
 
               {/* Success Details */}
@@ -702,11 +760,11 @@ export default function MintPage() {
                           setMintStep('mint');
                           setMintResult(null);
                         }}
-                        disabled={REMAINING <= 1}
+                        disabled={publicRemaining === 0}
                         className="bg-base-gray-100 text-base-black text-center py-3 rounded-lg font-medium hover:bg-base-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-                        aria-label={REMAINING <= 1 ? 'Collection sold out' : 'Mint another NFT'}
+                        aria-label={publicRemaining === 0 ? 'Public minting closed' : 'Mint another NFT'}
                       >
-                        {REMAINING <= 1 ? 'Sold Out' : 'Mint Another'}
+                        {publicRemaining === 0 ? 'Minting Closed' : 'Mint Another'}
                       </button>
                     </nav>
 

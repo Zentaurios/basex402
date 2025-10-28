@@ -159,7 +159,7 @@ export default function TermsPage() {
                 For questions about these Terms, contact us at:
               </p>
               <ul className="list-none" style={{ color: 'var(--text-secondary)' }}>
-                <li>Email: legal@basex402.com</li>
+                <li>Contact form coming soon</li>
                 <li>Website: <Link href="/" className="text-base-blue hover:underline">basex402.com</Link></li>
               </ul>
             </section>

@@ -14,24 +14,19 @@ const walletLimitStore = new Map<string, RateLimitEntry>();
 
 // Rate limit configuration
 const RATE_LIMITS = {
-  // IP-based limits (prevents spam from single source)
-  IP: {
-    maxRequests: 10, // 10 requests per window
-    windowMs: 60 * 60 * 1000, // 1 hour
-  },
-  // Wallet-based limits (prevents abuse from single wallet)
+  // Wallet-based limits (prevents abuse from single wallet with valid payments)
   WALLET: {
-    maxRequests: 5, // 5 mints per window
+    maxRequests: 20, // 20 valid payment attempts per hour per wallet
     windowMs: 60 * 60 * 1000, // 1 hour
   },
-  // Successful mint limits (stricter after payment)
+  // Successful mint limits (contract enforces 5 per wallet forever, this is just fast-fail)
   SUCCESS: {
-    maxRequests: 3, // 3 successful mints per window
-    windowMs: 24 * 60 * 60 * 1000, // 24 hours
+    maxRequests: 5, // 5 successful mints per wallet (matches contract limit)
+    windowMs: 24 * 60 * 60 * 1000, // 24 hours (actually forever in contract)
   },
   // IP-based successful mint limit (prevents multi-wallet bypass)
   IP_SUCCESS: {
-    maxRequests: 10, // Max 10 successful mints per IP per 24h (any wallet)
+    maxRequests: 10, // Max 10 successful mints per IP per 24h (across all wallets)
     windowMs: 24 * 60 * 60 * 1000, // 24 hours
   }
 };
@@ -100,6 +95,8 @@ function checkRateLimit(
 
 /**
  * Check if a mint request should be allowed
+ * NOTE: This should be called AFTER payment verification, not before
+ * Only counts requests with valid x402 payment signatures
  */
 export function checkMintRateLimit(
   ip: string,
@@ -110,25 +107,8 @@ export function checkMintRateLimit(
   resetTime?: number;
   remainingRequests?: number;
 } {
-  // Check IP-based rate limit
-  const ipCheck = checkRateLimit(
-    ipLimitStore,
-    ip,
-    RATE_LIMITS.IP.maxRequests,
-    RATE_LIMITS.IP.windowMs
-  );
-  
-  if (!ipCheck.allowed) {
-    const resetDate = new Date(ipCheck.resetTime);
-    return {
-      allowed: false,
-      reason: `Too many requests from this IP. Try again after ${resetDate.toLocaleTimeString()}.`,
-      resetTime: ipCheck.resetTime,
-      remainingRequests: 0
-    };
-  }
-  
-  // Check wallet-based rate limit if wallet provided
+  // Only check wallet-based rate limit (no IP limit for valid payments)
+  // x402 protocol itself prevents spam from invalid payments
   if (walletAddress) {
     const walletKey = walletAddress.toLowerCase();
     const walletCheck = checkRateLimit(
@@ -150,15 +130,15 @@ export function checkMintRateLimit(
     
     return {
       allowed: true,
-      remainingRequests: Math.min(ipCheck.remainingRequests, walletCheck.remainingRequests),
-      resetTime: Math.max(ipCheck.resetTime, walletCheck.resetTime)
+      remainingRequests: walletCheck.remainingRequests,
+      resetTime: walletCheck.resetTime
     };
   }
   
   return {
     allowed: true,
-    remainingRequests: ipCheck.remainingRequests,
-    resetTime: ipCheck.resetTime
+    remainingRequests: RATE_LIMITS.WALLET.maxRequests,
+    resetTime: Date.now() + RATE_LIMITS.WALLET.windowMs
   };
 }
 

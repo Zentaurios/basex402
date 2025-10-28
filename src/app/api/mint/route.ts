@@ -131,36 +131,28 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       );
     }
     
-    // ⚠️ RATE LIMITING TEMPORARILY DISABLED FOR TESTING
-    // TODO: Re-enable before production deployment
+    // ✅ RATE LIMITING ENABLED FOR PRODUCTION
+    // Strategy: Check 24h limits BEFORE payment, hourly limits AFTER payment verification
+    // 
+    // Flow:
+    // 1. Check 24h successful mint limits (fast-fail before payment signature)
+    //    - 5 mints per wallet per 24h (matches contract's permanent limit)
+    //    - 10 mints per IP per 24h (prevents multi-wallet bypass)
+    // 2. Process x402 payment (protocol provides spam protection)
+    // 3. Check hourly limits for valid payments only
+    //    - 20 valid payment attempts per hour per wallet
+    // 4. Track successful mint (updates 24h counters)
+    // 
+    // This approach:
+    // - Saves users from wasting payment signatures if already at 24h limit
+    // - Only counts legitimate payment attempts (not failed dev/test attempts)
+    // - x402 protocol prevents spam from invalid payments
+    // - Contract enforces 5 mints per wallet forever (our limit is just optimization)
     
-    /* COMMENTED OUT FOR TESTING
-    // RATE LIMITING: Check IP and wallet limits
-    const rateLimitCheck = checkMintRateLimit(clientIp, mintRequest.recipientWallet);
-    if (!rateLimitCheck.allowed) {
-      console.warn(`⚠️ Rate limit exceeded: ${rateLimitCheck.reason}`);
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: { 
-            message: rateLimitCheck.reason, 
-            code: 'RATE_LIMIT_EXCEEDED',
-            resetTime: rateLimitCheck.resetTime 
-          } 
-        },
-        { 
-          status: 429,
-          headers: rateLimitCheck.resetTime && rateLimitCheck.remainingRequests !== undefined
-            ? getRateLimitHeaders(rateLimitCheck.remainingRequests, rateLimitCheck.resetTime)
-            : {}
-        }
-      );
-    }
-    
-    // RATE LIMITING: Check successful mint limit (stricter)
-    const successLimitCheck = checkSuccessfulMintLimit(mintRequest.recipientWallet);
+    // RATE LIMITING: Check 24h successful mint limits BEFORE payment (prevents wasting signature)
+    const successLimitCheck = checkSuccessfulMintLimit(mintRequest.recipientWallet, clientIp);
     if (!successLimitCheck.allowed) {
-      console.warn(`⚠️ Successful mint limit exceeded: ${successLimitCheck.reason}`);
+      console.warn(`⚠️ 24h mint limit exceeded: ${successLimitCheck.reason}`);
       return NextResponse.json(
         { 
           success: false, 
@@ -173,10 +165,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         { status: 429 }
       );
     }
-    */
-    
-    // Create fake rate limit check for response headers
-    const rateLimitCheck = { allowed: true, remainingRequests: 999, resetTime: Date.now() + 3600000 };
 
     // Validate payment method
     if (!mintRequest.paymentMethod || !['email'].includes(mintRequest.paymentMethod)) {
@@ -269,6 +257,29 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }
 
     console.log(`✅ Payment verified successfully, proceeding with mint`);
+
+    // RATE LIMITING: Check hourly limit AFTER payment (only counts valid payment attempts)
+    // This is 20 valid payment attempts per hour per wallet
+    const rateLimitCheck = checkMintRateLimit(clientIp, mintRequest.recipientWallet);
+    if (!rateLimitCheck.allowed) {
+      console.warn(`⚠️ Hourly rate limit exceeded: ${rateLimitCheck.reason}`);
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: { 
+            message: rateLimitCheck.reason, 
+            code: 'RATE_LIMIT_EXCEEDED',
+            resetTime: rateLimitCheck.resetTime 
+          } 
+        },
+        { 
+          status: 429,
+          headers: rateLimitCheck.resetTime && rateLimitCheck.remainingRequests !== undefined
+            ? getRateLimitHeaders(rateLimitCheck.remainingRequests, rateLimitCheck.resetTime)
+            : {}
+        }
+      );
+    }
 
     // Now fetch the next token ID (only after payment is verified)
     const nextTokenId = await getNextTokenId();
@@ -505,9 +516,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       
       console.log(`✅ ${quantity} NFT(s) minted successfully to ${mintRequest.recipientWallet}: #${nextTokenId}${quantity > 1 ? ` - #${nextTokenId + quantity - 1}` : ''}`);
       
-      // Track successful mint for rate limiting (DISABLED FOR TESTING)
-      // trackSuccessfulMint(mintRequest.recipientWallet);
-      // console.log('📋 Successful mint tracked for rate limiting');
+      // Track successful mint for rate limiting
+      trackSuccessfulMint(mintRequest.recipientWallet, clientIp);
+      console.log('📋 Successful mint tracked for rate limiting');
 
       // Create payment response headers
       const paymentResponseHeaders = createPaymentResponseHeader(txHash);
@@ -530,9 +541,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     console.log(`✅ ${quantity} NFT(s) minted successfully to ${mintRequest.recipientWallet}: #${startTokenId}${quantity > 1 ? ` - #${endTokenId}` : ''}`);
 
-    // Track successful mint for rate limiting (DISABLED FOR TESTING)
-    // trackSuccessfulMint(mintRequest.recipientWallet);
-    // console.log('📋 Successful mint tracked for rate limiting');
+    // Track successful mint for rate limiting
+    trackSuccessfulMint(mintRequest.recipientWallet, clientIp);
+    console.log('📋 Successful mint tracked for rate limiting');
 
     // Create payment response headers
     const paymentResponseHeaders = createPaymentResponseHeader(txHash);

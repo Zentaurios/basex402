@@ -7,7 +7,10 @@ const CONTRACT_ADDRESS = RPC_CONFIG.isMainnet
   ? (process.env.NFT_CONTRACT_ADDRESS as `0x${string}`) || '0x362EbDDb00933852D80eBDCc8fA6c969dAE5268C' as `0x${string}`
   : (process.env.NFT_CONTRACT_ADDRESS_TESTNET as `0x${string}`);
 
-const MAX_PUBLIC_SUPPLY = 402;
+// Total supply is 402, but last 47 are reserved for airdrop
+const TOTAL_SUPPLY = 402;
+const AIRDROP_RESERVE = 47;
+const MAX_PUBLIC_SUPPLY = TOTAL_SUPPLY - AIRDROP_RESERVE; // 355
 
 // Minimal ABI for reading contract data
 const CONTRACT_ABI = [
