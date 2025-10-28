@@ -8,6 +8,7 @@ import "@/styles/wallet-dropdown-custom.css"; // Custom WalletDropdown styling
 import { Providers } from "./providers";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { Header } from "@/components/layout/Header";
+import { NetworkWarning } from "@/components/wallet/NetworkWarning";
 // import { PWAInstaller } from "@/components/PWAInstaller";
 // import { PWAUpdateNotifier } from "@/components/PWAUpdateNotifier";
 import { defaultMetadata, viewport as defaultViewport, organizationStructuredData } from "@/lib/metadata";
@@ -49,6 +50,9 @@ export default function RootLayout({
           enableSystem
         >
           <Providers>
+            {/* Network Warning Banner */}
+            <NetworkWarning />
+            
             {/* Header Component */}
             <Header isMainnet={isMainnet} networkName={networkName} />
 

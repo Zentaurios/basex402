@@ -3,6 +3,11 @@
 import { useState, useEffect } from 'react';
 import { useConnect, useAccount } from 'wagmi';
 import { Wallet as WalletIcon } from 'lucide-react';
+import { base, baseSepolia } from 'viem/chains';
+
+// Get the expected chain based on environment
+const isMainnet = process.env.NEXT_PUBLIC_ENABLE_MAINNET === 'true';
+const expectedChain = isMainnet ? base : baseSepolia;
 
 /**
  * Simple external wallet connector using wagmi directly
@@ -22,9 +27,6 @@ export function ExternalWalletConnect() {
     
     // Check if Phantom is installed
     setHasPhantom(typeof window !== 'undefined' && window.phantom?.ethereum !== undefined);
-    
-    // Debug: Log available connectors
-    console.log('🔍 Available connectors:', connectors.map(c => ({ id: c.id, name: c.name })));
   }, [connectors]);
 
   if (isConnected) {
@@ -52,39 +54,109 @@ export function ExternalWalletConnect() {
   const handleMetaMaskConnect = async () => {
     if (!metaMaskConnector || !hasMetaMask) return;
     
-    console.log('🦊 Connecting to MetaMask with connector:', metaMaskConnector.id);
+    console.log('🦊 Connecting to MetaMask with connector:', metaMaskConnector.id, 'on chain:', expectedChain.name);
     setSelectedWallet('metamask');
     
     try {
-      await connect({ connector: metaMaskConnector });
+      // ✅ Connect first
+      await connect({ 
+        connector: metaMaskConnector,
+        chainId: expectedChain.id 
+      });
+      
+      // ✅ Force MetaMask to switch to Base immediately after connection
+      if (typeof window !== 'undefined' && window.ethereum?.isMetaMask) {
+        try {
+          console.log('🦊 Attempting to add/switch MetaMask to Base...');
+          
+          // Use wallet_addEthereumChain - this will add Base or switch to it if already added
+          await window.ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [{
+              chainId: `0x${expectedChain.id.toString(16)}`, // Convert to hex
+              chainName: expectedChain.name,
+              nativeCurrency: {
+                name: 'Ether',
+                symbol: 'ETH',
+                decimals: 18,
+              },
+              rpcUrls: [isMainnet ? 'https://mainnet.base.org' : 'https://sepolia.base.org'],
+              blockExplorerUrls: [isMainnet ? 'https://basescan.org' : 'https://sepolia.basescan.org'],
+            }],
+          });
+          
+          console.log('✅ Successfully switched MetaMask to Base!');
+        } catch (switchError: any) {
+          // If user rejects or chain already exists, try direct switch
+          if (switchError.code === 4902) {
+            console.log('Chain already added, trying direct switch...');
+          } else {
+            console.error('Failed to switch MetaMask to Base:', switchError);
+          }
+        }
+      }
     } catch (error) {
       console.error('MetaMask connection error:', error);
       setSelectedWallet(null);
     }
   };
-
   const handlePhantomConnect = async () => {
     if (!phantomConnector || !hasPhantom) return;
     
-    console.log('👻 Connecting to Phantom with connector:', phantomConnector.id);
+    console.log('👻 Connecting to Phantom with connector:', phantomConnector.id, 'on chain:', expectedChain.name);
     setSelectedWallet('phantom');
     
     try {
-      await connect({ connector: phantomConnector });
+      // ✅ Connect first (Phantom will default to Ethereum)
+      await connect({ 
+        connector: phantomConnector,
+        chainId: expectedChain.id 
+      });
+      
+      // ✅ Force Phantom to switch to Base immediately after connection
+      if (typeof window !== 'undefined' && window.phantom?.ethereum) {
+        try {
+          console.log('👻 Attempting to add/switch Phantom to Base...');
+          
+          // Use wallet_addEthereumChain - this will add Base or switch to it if already added
+          await window.phantom.ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [{
+              chainId: `0x${expectedChain.id.toString(16)}`, // Convert to hex
+              chainName: expectedChain.name,
+              nativeCurrency: {
+                name: 'Ether',
+                symbol: 'ETH',
+                decimals: 18,
+              },
+              rpcUrls: [isMainnet ? 'https://mainnet.base.org' : 'https://sepolia.base.org'],
+              blockExplorerUrls: [isMainnet ? 'https://basescan.org' : 'https://sepolia.basescan.org'],
+            }],
+          });
+          
+          console.log('✅ Successfully switched Phantom to Base!');
+        } catch (switchError: any) {
+          // If user rejects, this will throw
+          console.error('Failed to switch Phantom to Base:', switchError);
+          // Don't throw - let the connection remain but show warning
+        }
+      }
     } catch (error) {
       console.error('Phantom connection error:', error);
       setSelectedWallet(null);
     }
   };
-
   const handleCoinbaseConnect = () => {
     if (!coinbaseConnector) return;
     
-    console.log('🔵 Connecting to Coinbase Wallet...');
+    console.log('🔵 Connecting to Coinbase Wallet on chain:', expectedChain.name);
     setSelectedWallet('coinbase');
-    connect({ connector: coinbaseConnector });
+    // ✅ Explicitly connect to Base chain
+    connect({ 
+      connector: coinbaseConnector,
+      chainId: expectedChain.id 
+    });
   };
-
   return (
     <div className="space-y-3">
       {/* Coinbase Wallet */}

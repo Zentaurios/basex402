@@ -52,7 +52,7 @@ function getRarityTier(tokenId: number) {
 }
 
 export default function MintPage() {
-  const { isConnected, address, walletType } = useWallet();
+  const { isConnected, address, walletType, isWrongNetwork } = useWallet();
   const { connector } = useAccount();
   // Chain management for external wallets
   const currentChainId = useChainId();
@@ -524,6 +524,29 @@ export default function MintPage() {
                     </div>
 
                     {/* Warning messages */}
+                    {isWrongNetwork && (
+                      <aside className="mt-4 bg-red-600/10 border-2 border-red-600/30 rounded-lg p-4" role="alert">
+                        <div className="text-red-600 text-sm font-bold text-center mb-3">
+                          ⚠️ Wrong Network - Minting Blocked
+                        </div>
+                        <div className="text-red-600 text-sm text-center mb-3">
+                          Your wallet connected to the wrong network. You need to be on <span className="font-bold underline">{networkName}</span>
+                        </div>
+                        <div className="bg-white/50 rounded p-3 text-left">
+                          <p className="text-xs font-semibold text-red-800 mb-2">💡 To fix this:
+                          </p>
+                          <ol className="text-xs text-red-800 space-y-1 list-decimal list-inside">
+                            <li><strong>Disconnect</strong> your wallet from this site</li>
+                            <li><strong>Open your wallet</strong> extension (Phantom/MetaMask/etc)</li>
+                            <li><strong>Switch to {networkName}</strong> in your wallet FIRST</li>
+                            <li><strong>Reconnect</strong> your wallet to this site</li>
+                          </ol>
+                          <div className="mt-2 text-xs text-red-900 italic">
+                            Note: Some wallets (like Phantom) connect to Ethereum by default. You must switch to {networkName} in your wallet BEFORE connecting.
+                          </div>
+                        </div>
+                      </aside>
+                    )}
                     {isLastPublicMint && publicRemaining > 0 && (
                       <aside className="mt-4 bg-warning/10 border border-warning/20 rounded-lg p-3" role="alert">
                         <div className="text-warning text-sm font-medium text-center">
@@ -630,21 +653,27 @@ export default function MintPage() {
 
                     <button
                       onClick={handleMint}
-                      disabled={isMinting || isWalletClientLoading || isSwitchingChain || publicRemaining === 0}
-                      className="w-full bg-base-blue text-white py-4 rounded-lg font-medium hover:bg-base-blue/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      disabled={isMinting || isWalletClientLoading || isSwitchingChain || publicRemaining === 0 || isWrongNetwork}
+                      className={`w-full py-4 rounded-lg font-medium transition-colors ${
+                        isWrongNetwork
+                          ? 'bg-red-600 text-white opacity-50 cursor-not-allowed'
+                          : 'bg-base-blue text-white hover:bg-base-blue/90 disabled:opacity-50 disabled:cursor-not-allowed'
+                      }`}
                       aria-label={isMinting ? `Minting ${quantity} NFT${quantity > 1 ? 's' : ''} in progress` : `Mint ${quantity} x402 Protocol NFT${quantity > 1 ? 's' : ''} for ${quantity} dollar${quantity > 1 ? 's' : ''} USDC`}
                     >
-                      {publicRemaining === 0
-                        ? 'Public Minting Closed'
-                        : isWalletClientLoading
-                          ? 'Initializing wallet...'
-                          : isSwitchingChain
-                            ? 'Switching network...'
-                            : isMinting
-                              ? `Minting ${quantity} NFT${quantity > 1 ? 's' : ''}...`
-                              : publicRemaining === 1 && quantity === 1
-                                ? `Mint Last NFT & Trigger Airdrop (${quantity} USDC)`
-                                : `Mint ${quantity} NFT${quantity > 1 ? 's' : ''} (${quantity} USDC)`
+                      {isWrongNetwork
+                        ? `Switch to ${networkName} First`
+                        : publicRemaining === 0
+                          ? 'Public Minting Closed'
+                          : isWalletClientLoading
+                            ? 'Initializing wallet...'
+                            : isSwitchingChain
+                              ? 'Switching network...'
+                              : isMinting
+                                ? `Minting ${quantity} NFT${quantity > 1 ? 's' : ''}...`
+                                : publicRemaining === 1 && quantity === 1
+                                  ? `Mint Last NFT & Trigger Airdrop (${quantity} USDC)`
+                                  : `Mint ${quantity} NFT${quantity > 1 ? 's' : ''} (${quantity} USDC)`
                       }
                     </button>
                   </div>

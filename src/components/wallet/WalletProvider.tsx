@@ -2,7 +2,9 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useIsSignedIn, useEvmAddress, useCurrentUser } from '@coinbase/cdp-hooks';
-import { useAccount, useDisconnect } from 'wagmi';
+import { useAccount, useDisconnect, useSwitchChain } from 'wagmi'; // ✅ Add useSwitchChain
+import { base, baseSepolia } from 'viem/chains';
+import toast from 'react-hot-toast';
 
 type WalletContextType = {
   isModalOpen: boolean;
@@ -10,13 +12,18 @@ type WalletContextType = {
   closeModal: () => void;
   isConnected: boolean;
   address: string | undefined;
-  eoaAddress: string | undefined;  // EOA address for x402 payments
-  smartAccountAddress: string | undefined;  // Smart account for display
+  eoaAddress: string | undefined;
+  smartAccountAddress: string | undefined;
   walletType: 'embedded' | 'external' | null;
   customDisconnect: () => void;
+  isWrongNetwork: boolean; // ✅ Add this
 };
 
 const WalletContext = createContext<WalletContextType | undefined>(undefined);
+
+// ✅ Add expected chain configuration
+const isMainnet = process.env.NEXT_PUBLIC_ENABLE_MAINNET === 'true';
+const expectedChain = isMainnet ? base : baseSepolia;
 
 export function WalletProvider({ children }: { children: ReactNode }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -30,25 +37,49 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   const { evmAddress: cdpAddress } = useEvmAddress();
   const { currentUser } = useCurrentUser();
   
-  // Get EOA owner address from CDP (the actual owner of the smart account)
   const cdpEoaAddress = currentUser?.evmAccounts?.[0];
   
   // Wagmi External Wallet state
-  const { isConnected: isWagmiConnected, address: wagmiAddress } = useAccount();
+  const { isConnected: isWagmiConnected, address: wagmiAddress, chain } = useAccount(); // ✅ Add chain
   const { disconnect } = useDisconnect();
+  const { switchChain } = useSwitchChain(); // ✅ Add this
+  
+  // ✅ Check if external wallet is on wrong network
+  const isWrongNetwork = isWagmiConnected && chain?.id !== expectedChain.id;
   
   // Initialize: Check for cross-contamination on mount
   useEffect(() => {
     if (!hasInitialized) {
-      // If CDP wallet is active and wagmi is also connected, disconnect wagmi
       if (cdpAddress && isCdpSignedIn && isWagmiConnected) {
         setBlockWagmiReconnect(true);
         disconnect();
       }
-      
       setHasInitialized(true);
     }
   }, [hasInitialized, cdpAddress, isCdpSignedIn, isWagmiConnected, disconnect]);
+  
+  // ✅ Better network switching with error handling
+  useEffect(() => {
+    if (isWagmiConnected && wagmiAddress && chain && chain.id !== expectedChain.id) {
+      const switchNetwork = async () => {
+        try {
+          await switchChain({ chainId: expectedChain.id });
+          toast.success(`Switched to ${expectedChain.name}`);
+        } catch (error: any) {
+          // Some wallets (like Phantom) don't support programmatic network switching
+          console.warn('Failed to switch network automatically:', error);
+          
+          // Show persistent warning with instructions
+          toast.error(
+            `⚠️ Wrong Network!\n\nDisconnect and switch to ${expectedChain.name} in your wallet, then reconnect.\n\nPhantom/some wallets connect to Ethereum by default.`,
+            { duration: 15000 }
+          );
+        }
+      };
+      
+      switchNetwork();
+    }
+  }, [isWagmiConnected, wagmiAddress, chain, switchChain]);
   
   // Track active wallet type changes
   useEffect(() => {
@@ -74,12 +105,10 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   let walletType: 'embedded' | 'external' | null;
   let isConnected: boolean;
   
-  // If force disconnected, ignore wagmi state completely
   if (forceDisconnected) {
-    // Only consider CDP wallet
     if (cdpAddress && isCdpSignedIn) {
-      address = cdpAddress;  // Display address (smart account)
-      eoaAddress = cdpEoaAddress;  // EOA for payments
+      address = cdpAddress;
+      eoaAddress = cdpEoaAddress;
       smartAccountAddress = cdpAddress;
       walletType = 'embedded';
       isConnected = true;
@@ -91,18 +120,15 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       isConnected = false;
     }
   } else {
-    // Normal flow - check wagmi first, then CDP
     if (wagmiAddress && isWagmiConnected) {
-      // For external wallets, address and EOA are the same
       address = wagmiAddress;
       eoaAddress = wagmiAddress;
       smartAccountAddress = undefined;
       walletType = 'external';
       isConnected = true;
     } else if (cdpAddress && isCdpSignedIn) {
-      // For CDP wallets, separate smart account and EOA
-      address = cdpAddress;  // Display address (smart account)
-      eoaAddress = cdpEoaAddress;  // EOA for payments
+      address = cdpAddress;
+      eoaAddress = cdpEoaAddress;
       smartAccountAddress = cdpAddress;
       walletType = 'embedded';
       isConnected = true;
@@ -116,19 +142,15 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   }
 
   const openModal = () => {
-    // Clear the block when user opens modal - they want to connect
     setBlockWagmiReconnect(false);
     setIsModalOpen(true);
   };
   const closeModal = () => setIsModalOpen(false);
 
-  // Custom disconnect function
   const customDisconnect = async () => {
-    // Disconnect wagmi
     disconnect();
   }
 
-  // Lock body scroll when modal is open
   useEffect(() => {
     if (isModalOpen) {
       document.body.style.overflow = 'hidden';
@@ -151,7 +173,8 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         eoaAddress,
         smartAccountAddress,
         walletType,
-        customDisconnect
+        customDisconnect,
+        isWrongNetwork, // ✅ Add this
       }}
     >
       {children}
