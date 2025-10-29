@@ -337,6 +337,19 @@ export async function settlePayment(
     // Log what we're sending for debugging
     console.log('📤 Sending to facilitator settle:', JSON.stringify(requestBody, null, 2));
     
+    // Log critical payment details for diagnostics
+    console.log('🔍 Settlement payment details:', {
+      from: paymentHeader.payload.authorization.from,
+      to: paymentHeader.payload.authorization.to,
+      value: paymentHeader.payload.authorization.value,
+      valueUSDC: parseInt(paymentHeader.payload.authorization.value) / 1000000,
+      nonce: paymentHeader.payload.authorization.nonce,
+      validAfter: new Date(parseInt(paymentHeader.payload.authorization.validAfter) * 1000).toISOString(),
+      validBefore: new Date(parseInt(paymentHeader.payload.authorization.validBefore) * 1000).toISOString(),
+      asset: paymentRequest.asset,
+      network: paymentHeader.network,
+    });
+    
     // Call facilitator settle endpoint with authentication
     const response = await fetch(`${COINBASE_FACILITATOR_BASE_URL}${settlePath}`, {
       method: 'POST',
@@ -351,9 +364,40 @@ export async function settlePayment(
     if (!response.ok) {
       const errorText = await response.text();
       console.error(`❌ Payment settlement failed on ${networkConfig.name}:`, response.status, response.statusText, errorText);
+      
+      // Parse error details if possible
+      let errorDetails;
+      try {
+        errorDetails = JSON.parse(errorText);
+      } catch {
+        errorDetails = { raw: errorText };
+      }
+      
+      // Add helpful diagnostic info
+      console.error(`📋 Settlement failure diagnostics:`, {
+        from: paymentHeader.payload.authorization.from,
+        to: paymentHeader.payload.authorization.to,
+        value: paymentHeader.payload.authorization.value,
+        nonce: paymentHeader.payload.authorization.nonce,
+        asset: paymentRequest.asset,
+        network: networkConfig.name,
+      });
+      
+      // Provide actionable error message
+      let userFriendlyError = errorText;
+      if (errorText.includes('unable to estimate gas')) {
+        userFriendlyError = `Transaction simulation failed. This usually means:
+1. The EOA (${paymentHeader.payload.authorization.from}) doesn't have enough USDC (need ${parseInt(paymentRequest.maxAmountRequired) / 1000000} USDC)
+2. The EOA doesn't have enough ETH for gas fees
+3. The nonce has already been used
+4. The authorization has expired
+
+Please check the EOA balance using: npx tsx scripts/check-eoa-balance.ts ${paymentHeader.payload.authorization.from}`;
+      }
+      
       return { 
         success: false,
-        error: errorText 
+        error: userFriendlyError 
       };
     }
 

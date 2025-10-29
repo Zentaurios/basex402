@@ -5,7 +5,7 @@ import type { Metadata, Viewport } from "next";
  * Uses generated logo assets and OpenGraph images
  */
 
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://x402.xyz";
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://basex402.com";
 
 /**
  * Viewport configuration for PWA
@@ -96,7 +96,7 @@ export const defaultMetadata: Metadata = {
     description: "Mint exclusive x402 NFTs celebrating the revolutionary x402 micropayments protocol. Limited to 402 NFTs on Base.",
     images: [
       {
-        url: "/images/og-default.png",
+        url: `${baseUrl}/images/og-default.png`,
         width: 1200,
         height: 630,
         alt: "x402 Pioneers - x402 Micropayments on Base",
@@ -111,7 +111,7 @@ export const defaultMetadata: Metadata = {
     creator: "@base",
     title: "x402 Pioneers | x402 Protocol NFTs",
     description: "Limited collection of 402 NFTs celebrating x402 micropayments. Mint yours for $1 USDC on Base.",
-    images: ["/images/og-default.png"],
+    images: [`${baseUrl}/images/og-default.png`],
   },
   
   // Robots
@@ -147,6 +147,8 @@ export function generatePageMetadata(
   ogImage?: string,
   additionalKeywords?: string[]
 ): Metadata {
+  const imageUrl = ogImage ? (ogImage.startsWith('http') ? ogImage : `${baseUrl}${ogImage}`) : undefined;
+  
   return {
     title,
     description,
@@ -155,10 +157,10 @@ export function generatePageMetadata(
       ...defaultMetadata.openGraph,
       title,
       description,
-      images: ogImage
+      images: imageUrl
         ? [
             {
-              url: ogImage,
+              url: imageUrl,
               width: 1200,
               height: 630,
               alt: title,
@@ -170,7 +172,7 @@ export function generatePageMetadata(
       ...defaultMetadata.twitter,
       title,
       description,
-      images: ogImage ? [ogImage] : (defaultMetadata.twitter?.images as string[]),
+      images: imageUrl ? [imageUrl] : (defaultMetadata.twitter?.images as string[]),
     },
   };
 }

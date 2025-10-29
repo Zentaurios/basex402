@@ -33,20 +33,7 @@ export function useX402Signer(): X402Signer | null {
   // For CDP wallets, use the EOA address as the signer address
   const eoaAddress = currentUser?.evmAccounts?.[0];
 
-  console.log('🔍 [useX402Signer]', 
-    isCdpWallet ? 'Using CDP smart account wallet' : 'Using external wallet',
-    { 
-      walletType,
-      address,
-      smartAccountAddress: cdpAddress,
-      eoaAddress: eoaAddress,
-      signerAddress: isCdpWallet ? eoaAddress : address,  // EOA for CDP, wallet address for external
-      hasSignTypedData: !!cdpSignTypedData,
-      hasCurrentUser: !!currentUser,
-      hasWalletClient: !!walletClient,
-      isLoading: isWalletClientLoading 
-    }
-  );
+  // Initialize signer based on wallet type
 
   // Memoize the signTypedData function for CDP wallets
   const wrappedCdpSignTypedData = useCallback(
@@ -76,35 +63,15 @@ export function useX402Signer(): X402Signer | null {
 
       // ✅ SECURITY: Validate that cdpAddress matches our wallet context
       if (address !== cdpAddress) {
-        console.error('❌ [useX402Signer] Address mismatch!', {
-          contextAddress: address,
-          cdpAddress: cdpAddress,
-        });
         throw new Error('Security error: Address mismatch detected. The CDP address does not match the wallet context.');
       }
 
       // ✅ SECURITY: Validate smart account ownership via currentUser
       if (currentUser?.evmSmartAccounts?.[0] && currentUser.evmSmartAccounts[0] !== cdpAddress) {
-        console.error('❌ [useX402Signer] Smart account mismatch!', {
-          expectedSmartAccount: currentUser.evmSmartAccounts[0],
-          actualAddress: cdpAddress,
-        });
         throw new Error('Security error: Smart account mismatch. The address does not match the user\'s smart account.');
       }
 
       try {
-        console.log('✍️ [useX402Signer] Signing with CDP wallet...', {
-          primaryType: params.primaryType,
-          domain: params.domain,
-          smartAccountAddress: cdpAddress,
-          eoaAddress: eoaAddress,
-        });
-
-        console.log('🔐 [useX402Signer] Signing with EOA...', {
-          eoaAddress,
-          smartAccount: cdpAddress,
-          messageFrom: params.message.from,
-        });
 
         // Sign with the EOA (owner)
         const result = await cdpSignTypedData({
@@ -127,11 +94,6 @@ export function useX402Signer(): X402Signer | null {
         } else if (result && typeof result === 'object' && 'data' in result) {
           signature = (result as any).data;
         } else {
-          console.error('❌ [useX402Signer] Unexpected result format:', {
-            result,
-            resultType: typeof result,
-            resultKeys: result && typeof result === 'object' ? Object.keys(result) : 'not an object'
-          });
           throw new Error(`Invalid signature format received from CDP. Expected string or object with 'signature' property, got: ${typeof result}`);
         }
         
@@ -141,36 +103,11 @@ export function useX402Signer(): X402Signer | null {
         }
         
         if (!signature.startsWith('0x')) {
-          console.warn('⚠️ Signature does not start with 0x, adding prefix...');
           signature = '0x' + signature;
         }
-        
-        if (signature.length !== 132) { // 0x + 130 hex chars
-          console.warn('⚠️ Signature length is unexpected:', {
-            length: signature.length,
-            expected: 132,
-            signature: signature.slice(0, 20) + '...' + signature.slice(-10)
-          });
-        }
-
-        console.log('✅ [useX402Signer] CDP signature successful:', {
-          signaturePreview: signature.slice(0, 20) + '...' + signature.slice(-10),
-          signatureLength: signature.length,
-          signedWithEOA: eoaAddress,
-          messageFrom: params.message.from,
-        });
 
         return signature;
       } catch (error) {
-        console.error('❌ [useX402Signer] CDP signing error:', {
-          error,
-          errorName: (error as any)?.name,
-          errorMessage: (error as any)?.message,
-          errorCode: (error as any)?.code,
-          errorStack: (error as any)?.stack?.split('\n').slice(0, 5).join('\n'),
-          smartAccountAddress: cdpAddress,
-          eoaAddress: currentUser?.evmAccounts?.[0],
-        });
 
         // Provide user-friendly error message
         if ((error as any)?.message?.includes('EVM account not found')) {
@@ -203,10 +140,6 @@ export function useX402Signer(): X402Signer | null {
       }
 
       try {
-        console.log('✍️ [useX402Signer] External wallet signing typed data...', {
-          primaryType: params.primaryType,
-          domain: params.domain,
-        });
 
         // Convert to TypedDataDefinition format for wagmi
         const signature = await walletClient.signTypedData({
@@ -215,10 +148,6 @@ export function useX402Signer(): X402Signer | null {
           primaryType: params.primaryType,
           message: params.message,
         } as TypedDataDefinition);
-
-        console.log('✅ [useX402Signer] External signature successful:', {
-          signature: signature?.slice(0, 20) + '...',
-        });
 
         return signature;
       } catch (error) {
@@ -246,7 +175,6 @@ export function useX402Signer(): X402Signer | null {
   if (isExternalWallet && walletClient && address) {
     // Type guard to ensure address is in the correct format
     if (!address.startsWith('0x')) {
-      console.error('❌ [useX402Signer] Invalid address format:', address);
       return null;
     }
     
