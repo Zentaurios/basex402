@@ -8,11 +8,13 @@ import { coinbaseWallet, injected } from 'wagmi/connectors';
 const isMainnet = process.env.NEXT_PUBLIC_ENABLE_MAINNET === 'true';
 
 // Get RPC URLs from environment or use fallback
-// Note: You MUST set NEXT_PUBLIC_BASE_MAINNET_RPC in .env.local
-// Coinbase Cloud: https://api.developer.coinbase.com/rpc/v1/base/YOUR_CDP_API_KEY_NAME
-// Alchemy: https://base-mainnet.g.alchemy.com/v2/YOUR_API_KEY
-const baseRpcUrl = process.env.NEXT_PUBLIC_BASE_MAINNET_RPC || 'https://mainnet.base.org';
-const sepoliaRpcUrl = process.env.NEXT_PUBLIC_BASE_SEPOLIA_RPC || 'https://sepolia.base.org';
+// IMPORTANT: NEXT_PUBLIC_* vars are exposed to browser and can't use auth
+// Use public RPC endpoints for all client-side operations
+const baseRpcUrl = 'https://mainnet.base.org';
+const sepoliaRpcUrl = 'https://sepolia.base.org';
+
+// Note: For server-side operations that need authenticated RPC,
+// use the CDP_API_KEY_ID directly in your server actions/API routes
 
 // Configure HTTP transport with aggressive timeouts and retries
 const httpConfig = {
