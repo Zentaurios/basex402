@@ -200,14 +200,7 @@ export default function MintPage() {
       }
     }
 
-    // Debug: Log wallet detection
-    console.log('🔍 Wallet Detection:', {
-      detectedType: walletType,
-      address,
-      hasWalletClient: !!walletClient,
-      connectorName: connector?.name,
-      currentChainId,
-    });
+    // Wallet detection complete
 
     setIsMinting(true);
 
@@ -215,18 +208,8 @@ export default function MintPage() {
     const loadingToast = toast.loading('Initiating x402 payment flow...');
 
     try {
-      console.log(`Starting x402 payment and NFT mint for ${quantity} NFT(s)...`);
-
       // Step 1: Initial request
       toast.loading('📡 Step 1: Requesting mint from server...', { id: loadingToast });
-
-      console.log('🔍 [MINT DEBUG] Starting mint request:', {
-        eoaAddress: signer.eoaAddress,
-        signerAddress: signerAddress,
-        smartAccountAddress: signer.address,
-        recipientWallet: signer.eoaAddress || signerAddress,
-        quantity: quantity
-      });
       
       // ✅ NEW: Use the signer directly - it's already validated and has the correct type
       const x402Signer: X402Signer = signer;
@@ -263,27 +246,9 @@ export default function MintPage() {
 
       const data = await response.json();
 
-      console.log('📥 [MINT DEBUG] API Response:', {
-        status: response.status,
-        ok: response.ok,
-        data: data
-      });
-
       if (!response.ok) {
-        // Log the full error details for debugging
-        console.error('❌ Mint API Error Response:', {
-          status: response.status,
-          statusText: response.statusText,
-          errorData: data,
-          errorMessage: data.error?.message,
-          errorCode: data.error?.code,
-          errorDetails: data.error?.details
-        });
-
         throw new Error(data.error?.message || 'Minting failed');
       }
-
-      console.log('✅ NFT(s) minted successfully:', data);
 
       // Success!
       toast.success(`🎉 Successfully minted ${quantity} NFT${quantity > 1 ? 's' : ''}!`, { id: loadingToast, duration: 5000 });
@@ -294,7 +259,7 @@ export default function MintPage() {
         transactionHash: data.data.transactionHash,
         contractAddress: data.data.contractAddress,
         explorerUrl: data.data.transactionUrl,
-        openseaUrl: "https://opensea.io/collection/x402-protocol-pioneers/" + (data.data.tokenIds ? data.data.tokenIds[0] : data.data.tokenId),
+        openseaUrl: "https://opensea.io/item/base/0x362ebddb00933852d80ebdcc8fa6c969dae5268c/" + (data.data.tokenIds ? data.data.tokenIds[0] : data.data.tokenId),
       });
       setMintStep('success');
 
